@@ -1,0 +1,1086 @@
+<html>
+
+<head>
+    <title>Critter Mound</title>
+    <script src="Scripts/jquery-2.1.1.min.js"></script>
+    <script src="Scripts/knockout-3.1.0.js"></script>
+    <script src="Scripts/tipped.js"></script>
+    <script src="Scripts/imagesloaded.pkgd.min.js"></script>
+    <script src="Scripts/notify.min.js"></script>
+    <script src="Scripts/Site.js"></script>
+    <script src="Scripts/tabcontent.js"></script>
+    <script src="Scripts/jquery.base64.min.js"></script>
+    <script src="Scripts/jquery.simplemodal.1.4.4.min.js"></script>
+    <link href="Content/Site.min.css" rel="stylesheet" />
+    <link href="Content/tipped.css" rel="stylesheet" />
+
+    <meta name="description" content="Casual Incrimental Broswer Game.  Breed Critters to Advance.">
+    <meta name="ROBOTS" content="INDEX, NOFOLLOW">
+</head>
+
+<body>
+    <div id="pageContent">
+        <div style="float: right; padding: 3px; font-weight: bold;">
+            <span style="margin-left: 15px" data-bind="text: 'Generations: ' + gameFormatNumber(generations())"></span>
+            <span style="margin-left: 15px" data-bind="text: 'Sod: ' + gameFormatNumber(sod())"></span>
+        </div>
+        <div class="title">
+            Critter Mound 
+        </div>
+
+        <div style="margin-top: 10px;"></div>
+        <ul class="tabs">
+            <li class="male"><a href="#tabs-hatchery" title="">Royal Hatchery (<span data-bind="text: femaleMound().length + maleMound().length"></span>/<span data-bind="text: maxFemaleMoundSize() + maxMaleMoundSize()"></span>)</a></li>
+            <li class="female" data-bind="visible: isHeirsUnlocked"><a href="#tabs-heirs" title="">Heir Hatchery (<span data-bind="text: princessMound().length + princeMound().length"></span>/<span data-bind="text: maxPrincessMoundSize() + maxPrinceMoundSize()"></span>)</a></li>
+            <li class="mine"><a href="#tabs-production" title="">Workers  (<span data-bind="text: '+' + gameFormatNumber(factorySodPerSecond())+ '/s'"></span>)</a></li>
+            <li class="army" data-bind="css: { battle: inBattle}"><a href="#tabs-barracks" title="">Soldiers (<span data-bind="text: armyMound().length"></span>/<span data-bind="text: maxArmyMoundSize()"></span>)</a></li>
+            <li class="achievement"><a href="#tabs-achievements" title="">Achievements (<span data-bind="text: achievementsUnlocked()"></span>/<span data-bind="text: achievements().length"></span>)</a></li>
+            <li><a href="#tabs-information" title="">How To Play</a></li>
+        </ul>
+
+        <div class="tabcontents">
+            <div id="tabs-hatchery" class="tab" style="display:none">
+                <table cellspacing="10">
+                    <tr>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter female">
+                                <thead>
+                                    <tr>
+                                        <th colspan="3" class="noborder tableheader">Queen</th>
+                                        <th colspan="4" style="text-align: right" class="noborder">
+                                            <button data-bind="text: pauseBreeding() ? 'unpause' : 'pause', click: $root.TogglePauseBreeding.bind($root), clickBubble: false">pause</button>
+                                            <button data-bind="text: 'boost: ' + boosts() + ' / ' + maxBoosts(), click: $root.Boost.bind($root, 'Mother'), clickBubble: false, disable: boosts() < 1">boost</button>
+                                            <button class="upgrade" data-bind="visible: maxFemaleMoundSize() < 9,text: 'upgrade ' + gameFormatNumber(femaleMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'FemaleHatchery'), clickBubble: false, disable: sodRaw() < femaleMoundUpgradeCost()"></button>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'critterHeader', data: mother } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'critterRow', foreach: mother, as: 'critter' }"></tbody>
+                            </table>
+                        </td>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter male">
+                                <thead>
+                                    <tr>
+                                        <th colspan="3" class="noborder tableheader">King</th>
+                                        <th colspan="4" style="text-align: right" class="noborder">
+                                            <button data-bind="text: pauseBreeding() ? 'unpause' : 'pause', click: $root.TogglePauseBreeding.bind($root), clickBubble: false">pause</button>
+                                            <button data-bind="text: 'boost: ' + boosts() + ' / ' + maxBoosts(), click: $root.Boost.bind($root, 'Father'), clickBubble: false, disable: boosts() < 1">boost</button>
+                                            <button class="upgrade" data-bind="visible: maxMaleMoundSize() < 9,text: 'upgrade ' + gameFormatNumber(maleMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'MaleHatchery'), clickBubble: false, disable: sodRaw() < maleMoundUpgradeCost()"></button>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'critterHeader', data: mother } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'critterRow', foreach: father, as: 'critter' }"></tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter female hatchery">
+                                <thead>
+                                    <tr>
+                                        <th colspan="7" class="noborder tableheader">
+                                            <div style="float: right">
+                                                <button class="female one" data-bind="click: $root.Move.bind($root, 'Mate','Female'), clickBubble: false">queen</button>
+                                                <button class="female two" style="display: none;" data-bind="click: $root.Move.bind($root, 'MateYoung','Female'), clickBubble: false">princess</button>
+                                                <button class="mine" data-bind="click: $root.Move.bind($root, 'Worker','Female'), clickBubble: false">worker</button>
+                                                <button class="army" data-bind="click: $root.Move.bind($root, 'Army','Female'), clickBubble: false, disable: inBattle, css: { battle: inBattle}">soldier</button>
+                                                <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Female'), clickBubble: false">sacrifice</button>
+                                                <select data-bind="value: femaleSort, options: sorts, event:{ change: Sort }"></select>
+                                            </div>
+                                            Hatchery <span data-bind="text: femaleMound().length"></span>/<span data-bind="text: maxFemaleMoundSize()"></span>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'critterHeader', data: mother } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'critterRow', foreach: femaleMound, as: 'critter' }"></tbody>
+                                <tfoot data-bind="template: { name: 'critterRowEmpty', foreach: femaleMoundEmpty }"></tfoot>
+                            </table>
+                        </td>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter male hatchery">
+                                <thead>
+                                    <tr>
+                                        <th colspan="7" class="noborder tableheader">
+                                            <div style="float: right">
+                                                <button class="male one" data-bind="click: $root.Move.bind($root, 'Mate','Male'), clickBubble: false">king</button>
+                                                <button class="male two" style="display: none;" data-bind="click: $root.Move.bind($root, 'MateYoung','Male'), clickBubble: false">prince</button>
+                                                <button class="mine" data-bind="click: $root.Move.bind($root, 'Worker','Male'), clickBubble: false">worker</button>
+                                                <button class="army" data-bind="click: $root.Move.bind($root, 'Army','Male'), clickBubble: false, disable: inBattle, css: { battle: inBattle}">soldier</button>
+                                                <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Male'), clickBubble: false">sacrifice</button>
+                                                <select data-bind="value: maleSort, options: sorts, event:{ change: Sort }"></select>
+                                            </div>
+                                            Hatchery <span data-bind="text: maleMound().length"></span>/<span data-bind="text: maxMaleMoundSize()"></span>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'critterHeader', data: mother } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'critterRow', foreach: maleMound, as: 'critter' }"></tbody>
+                                <tfoot data-bind="template: { name: 'critterRowEmpty', foreach: maleMoundEmpty }"></tfoot>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="tabs-heirs" class="tab" style="display:none">
+                <table cellspacing="10">
+                    <tr>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter female">
+                                <thead>
+                                    <tr>
+                                        <th colspan="3" class="noborder tableheader">Princess (<span data-bind="text: gameFormatNumber(Math.round((princess().score * 5) - ((princess().currentHealth() / princess().health) * (princess().score * 5))))"></span> sod needed)</th>
+                                        <th colspan="4" style="text-align: right" class="noborder">
+                                            <button class="upgrade" data-bind="visible: maxPrincessMoundSize() < 9,text: 'upgrade ' + gameFormatNumber(princessMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'PrincessHatchery'), clickBubble: false, disable: sodRaw() < princessMoundUpgradeCost()"></button>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'critterHeader', data: mother } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'critterRow', foreach: princess, as: 'critter' }"></tbody>
+                            </table>
+                        </td>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter male">
+                                <thead>
+                                    <tr>
+                                        <th colspan="3" class="noborder tableheader">Prince (<span data-bind="text: gameFormatNumber(Math.round((prince().score * 5) - ((prince().currentHealth() / prince().health) * (prince().score * 5))))"></span> sod needed)</th>
+                                        <th colspan="4" style="text-align: right" class="noborder">
+                                            <button class="upgrade" data-bind="visible: maxPrinceMoundSize() < 9,text: 'upgrade ' + gameFormatNumber(princeMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'PrinceHatchery'), clickBubble: false, disable: sodRaw() < princeMoundUpgradeCost()"></button>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'critterHeader', data: mother } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'critterRow', foreach: prince, as: 'critter' }"></tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h4>Percentage of Sod Per Second To Contribute to the Newlyweds: <span data-bind="text: sodDedicatedToBreeding, css: { higher: sodDedicatedToBreeding() > 0 && sodDedicatedToBreeding() <= 100,lower: sodDedicatedToBreeding() > 100 }"></span>% (<span data-bind="text: gameFormatNumber(sodPerSecondForBreeding)"></span>/s)</h4>
+                        </td>
+                        <td>
+                            <input style="width: 100%" type="range" min="0" max="150" step="5" data-bind="value: sodDedicatedToBreeding">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter female hatchery">
+                                <thead>
+                                    <tr>
+                                        <th colspan="7" class="noborder tableheader">
+                                            <div style="float: right">
+                                                <button class="female two" style="display: none;" data-bind="click: $root.Move.bind($root, 'Mate','Princess'), clickBubble: false">queen</button>
+                                                <button class="female one" data-bind="click: $root.Move.bind($root, 'MateYoung','Princess'), clickBubble: false">princess</button>
+                                                <button class="mine" data-bind="click: $root.Move.bind($root, 'Worker','Princess'), clickBubble: false">worker</button>
+                                                <button class="army" data-bind="click: $root.Move.bind($root, 'Army','Princess'), clickBubble: false, disable: inBattle, css: { battle: inBattle}">soldier</button>
+                                                <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Princess'), clickBubble: false">sacrifice</button>
+                                                <select data-bind="value: princessSort, options: sorts, event:{ change: Sort }"></select>
+                                            </div>
+                                            Hatchery <span data-bind="text: princessMound().length"></span>/<span data-bind="text: maxPrincessMoundSize()"></span>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'critterHeader', data: mother } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'critterRow', foreach: princessMound, as: 'critter' }"></tbody>
+                                <tfoot data-bind="template: { name: 'critterRowEmpty', foreach: princessMoundEmpty }"></tfoot>
+                            </table>
+                        </td>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter male hatchery">
+                                <thead>
+                                    <tr>
+                                        <th colspan="7" class="noborder tableheader">
+                                            <div style="float: right">
+                                                <button class="male two" style="display: none;" data-bind="click: $root.Move.bind($root, 'Mate','Prince'), clickBubble: false">king</button>
+                                                <button class="male one" data-bind="click: $root.Move.bind($root, 'MateYoung','Prince'), clickBubble: false">prince</button>
+                                                <button class="mine" data-bind="click: $root.Move.bind($root, 'Worker','Prince'), clickBubble: false">worker</button>
+                                                <button class="army" data-bind="click: $root.Move.bind($root, 'Army','Prince'), clickBubble: false, disable: inBattle, css: { battle: inBattle}">soldier</button>
+                                                <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Prince'), clickBubble: false">sacrifice</button>
+                                                <select data-bind="value: princeSort, options: sorts, event:{ change: Sort }"></select>
+                                            </div>
+                                            Hatchery <span data-bind="text: princeMound().length"></span>/<span data-bind="text: maxPrinceMoundSize()"></span>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'critterHeader', data: mother } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'critterRow', foreach: princeMound, as: 'critter' }"></tbody>
+                                <tfoot data-bind="template: { name: 'critterRowEmpty', foreach: princeMoundEmpty }"></tfoot>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="tabs-production" class="tab" style="display:none">
+                <table cellspacing="10">
+                    <tr>
+                        <td colspan="2" style="vertical-align: top;">
+                            <table class="production" style="width: 1050px; margin: 0 auto;">
+                                <thead>
+                                    <tr>
+                                        <th class="noborder" colspan="7">
+                                            <img src="Content/images/Production.png" alt="" style="width: 986px" />
+                                        </th>
+                                    </tr>
+                                    <tr class="header">
+                                        <th style="width: 150px; text-align: center">Mined Dirt</th>
+                                        <th style="width: 150px; text-align: center">Carried Dirt</th>
+                                        <th style="width: 150px; text-align: center">Factory Dirt</th>
+                                        <th style="width: 150px; text-align: center">Produced Sod</th>
+                                        <th style="width: 150px; text-align: center">Factory Grass</th>
+                                        <th style="width: 150px; text-align: center">Carried Grass</th>
+                                        <th style="width: 150px; text-align: center">Farmed Grass</th>
+                                    </tr>
+                                    <tr class="stats">
+                                        <th>
+                                            <span data-bind="text: gameFormatNumber(dirt()), css: { lower: dirt() <= 0 }"></span>
+                                            <span style="white-space: nowrap; font-size: 0.85em" data-bind="text: mineDirtPerSecond() >= 0 ? ' + ' + gameFormatNumber(mineDirtPerSecond()) + ' /s': ' - ' + gameFormatNumber(Math.abs(mineDirtPerSecond())) + ' /s', css: { higher: mineDirtPerSecond() > 0, lower: mineDirtPerSecond() <= 0}"></span>
+                                        </th>
+                                        <th>
+                                            <span data-bind="text: gameFormatNumber(carryMineDirtPerSecond())+ ' /s', css: { higher: carryMineDirtPerSecond() >= 0 && carryPerSecond() >= mineDirtPerSecond(), lower: carryMineDirtPerSecond() == 0 || carryMineDirtPerSecond() < carryPerSecond() }"></span>
+
+                                        </th>
+                                        <th>
+                                            <span data-bind="text: gameFormatNumber(factoryDirt())"></span>
+                                            <span style="white-space: nowrap; font-size: 0.85em" data-bind="text: factoryDirtPerSecond() >= 0 ? ' + ' + gameFormatNumber(factoryDirtPerSecond())+ ' /s' : ' - ' + gameFormatNumber(Math.abs(factoryDirtPerSecond()))+ ' /s', css: { higher: factoryDirtPerSecond() > 0, lower: factoryDirtPerSecond() <= 0}"></span>
+                                        </th>
+                                        <th>
+                                            <span data-bind="text: gameFormatNumber(sod())"></span>
+                                            <span style="white-space: nowrap; font-size: 0.85em" data-bind="text: ' + ' + gameFormatNumber(factorySodPerSecond())+ ' /s', css: { higher: factorySodPerSecond() > 0, lower: factorySodPerSecond() <= 0}"></span>
+
+                                        </th>
+                                        <th>
+                                            <span data-bind="text: gameFormatNumber(factoryGrass()), css: { lower: factoryGrass() <= 0 }"></span>
+                                            <span style="white-space: nowrap; font-size: 0.85em" data-bind="text: factoryGrassPerSecond() >= 0 ? ' + ' + gameFormatNumber(factoryGrassPerSecond())+ ' /s' : ' - ' + gameFormatNumber(Math.abs(factoryGrassPerSecond()))+ ' /s', css: { higher: factoryGrassPerSecond() > 0, lower: factoryGrassPerSecond() <= 0}"></span>
+                                        </th>
+                                        <th>
+                                            <span data-bind="text: gameFormatNumber(carryFarmGrassPerSecond())+ ' /s', css: { higher: carryFarmGrassPerSecond() >= carryPerSecond(), lower: carryFarmGrassPerSecond() == 0 || carryFarmGrassPerSecond() < carryPerSecond() }"></span>
+                                        </th>
+                                        <th>
+                                            <span data-bind="text: gameFormatNumber(grass()), css: { lower: grass() <= 0 }"></span>
+                                            <span style="white-space: nowrap; font-size: 0.85em" data-bind="text: farmGrassPerSecond() >= 0 ? ' + ' + gameFormatNumber(farmGrassPerSecond())+ ' /s' : ' - ' + gameFormatNumber(Math.abs(farmGrassPerSecond()))+ ' /s', css: { higher: farmGrassPerSecond() > 0, lower: farmGrassPerSecond() <= 0}"></span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter mine">
+                                <thead>
+                                    <tr>
+                                        <th colspan="4" class="noborder tableheader">Mine <span data-bind="text: mineMound().length"></span>/<span data-bind="text: maxMineMoundSize()"></span> (<span data-bind="text: gameFormatNumber(dirtPerSecond())"></span> dirt per second)</th>
+                                        <th colspan="3" style="text-align: right" class="noborder">
+                                            <button class="upgrade" data-bind="visible: maxMineMoundSize() < 9, text: 'upgrade ' + gameFormatNumber(mineMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Mine'), clickBubble: false, disable: sodRaw() < mineMoundUpgradeCost()">upgrade</button>
+                                            <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Mine'), clickBubble: false">sacrifice</button>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'workerHeader' } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'workerRow', foreach: mineMound, as: 'critter' }"></tbody>
+                                <tfoot data-bind="template: { name: 'critterRowEmpty', foreach: mineMoundEmpty }"></tfoot>
+                            </table>
+                        </td>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter farm">
+                                <thead>
+                                    <tr>
+                                        <th colspan="4" class="noborder tableheader">Farm <span data-bind="text: farmMound().length"></span>/<span data-bind="text: maxFarmMoundSize()"></span> (<span data-bind="text: gameFormatNumber(grassPerSecond())"></span> grass per second)</th>
+                                        <th colspan="3" style="text-align: right" class="noborder">
+                                            <button class="upgrade" data-bind="visible: maxFarmMoundSize() < 9, text: 'upgrade ' + gameFormatNumber(farmMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Farm'), clickBubble: false, disable: sodRaw() < farmMoundUpgradeCost()">upgrade</button>
+                                            <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Farm'), clickBubble: false">sacrifice</button>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'workerHeader' } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'workerRow', foreach: farmMound, as: 'critter' }"></tbody>
+                                <tfoot data-bind="template: { name: 'critterRowEmpty', foreach: farmMoundEmpty }"></tfoot>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter carrier">
+                                <thead>
+                                    <tr>
+                                        <th colspan="4" class="noborder tableheader">Carriers <span data-bind="text: carrierMound().length"></span>/<span data-bind="text: maxCarrierMoundSize()"></span> (<span data-bind="text: gameFormatNumber(carryPerSecond())"></span> carry per second)</th>
+                                        <th colspan="3" style="text-align: right" class="noborder">
+                                            <button class="upgrade" data-bind="visible: maxCarrierMoundSize() < 9, text: 'upgrade ' + gameFormatNumber(carrierMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Carrier'), clickBubble: false, disable: sodRaw() < carrierMoundUpgradeCost()">upgrade</button>
+                                            <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Carrier'), clickBubble: false">sacrifice</button>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'workerHeader' } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'workerRow', foreach: carrierMound, as: 'critter' }"></tbody>
+                                <tfoot data-bind="template: { name: 'critterRowEmpty', foreach: carrierMoundEmpty }"></tfoot>
+                            </table>
+                        </td>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter factory">
+                                <thead>
+                                    <tr>
+                                        <th colspan="4" class="noborder tableheader">Factory <span data-bind="text: factoryMound().length"></span>/<span data-bind="text: maxFactoryMoundSize()"></span> (<span data-bind="text: gameFormatNumber(sodPerSecond())"></span> sod per second)</th>
+                                        <th colspan="3" style="text-align: right" class="noborder">
+                                            <button class="upgrade" data-bind="visible: maxFactoryMoundSize() < 9, text: 'upgrade ' + gameFormatNumber(factoryMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Factory'), clickBubble: false, disable: sodRaw() < factoryMoundUpgradeCost()">upgrade</button>
+                                            <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Factory'), clickBubble: false">sacrifice</button>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'workerHeader' } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'workerRow', foreach: factoryMound, as: 'critter' }"></tbody>
+                                <tfoot data-bind="template: { name: 'critterRowEmpty', foreach: factoryMoundEmpty }"></tfoot>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="tabs-barracks" class="tab" style="display:none">
+                <table cellspacing="10">
+                    <tr data-bind="visible: atWar">
+                        <td>
+                            <div style="float: right">
+                                <button data-bind="text: pauseAutoBattle() ? 'unpause' : 'pause', click: $root.TogglePauseAutoBattle.bind($root), clickBubble: false">pause</button>
+                            </div>
+                            <h4 data-bind="text: inBattle() ? 'We have engaged the enemy!' : !armyUpgrades().hasGeneral() ? 'We need a general to hunt down enemies' : map().tilesCleared() < map().tileCount() ? 'Hunting nearby enemies' : 'We have been victorious! The war is over.'"></h4>
+
+                            <div class="progressbarborder">
+                                <div class="progressbar enemy" data-bind="style: { width: autoBattleClockPercentage }">&nbsp;</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="float: right">
+                                <button data-bind="text: pauseExplore() ? 'unpause' : 'pause', click: $root.TogglePauseExplore.bind($root), clickBubble: false">pause</button>
+                            </div>
+                            <h4 data-bind="text: inBattle() ? 'Drop your telescope and fight!' : !armyUpgrades().hasScout() ? 'We need a scout to explore' : map().canExplore() ? 'Scouting nearby locations' : 'There is no where to scout'"></h4>
+
+                            <div class="progressbarborder">
+                                <div class="progressbar army" data-bind="style: { width: exploreClockPercentage }">&nbsp;</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top; width: 50%">
+                            <table class="critter army">
+                                <thead>
+                                    <tr>
+                                        <th colspan="3" class="noborder tableheader">Army <span data-bind="text: armyMound().length"></span>/<span data-bind="text: maxArmyMoundSize()"></span></th>
+                                        <th colspan="4" style="text-align: right; color: black" class="noborder">
+                                            <button class="upgrade" data-bind="visible: maxArmyMoundSize() < 9, text: 'upgrade ' + gameFormatNumber(armyMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Army'), clickBubble: false, disable: sodRaw() < armyMoundUpgradeCost()">upgrade</button>
+                                            <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Army'), clickBubble: false, disable: $root.inBattle">sacrifice</button>
+                                            <select data-bind="value: armySort, options: armySorts, event:{ change: Sort }"></select>
+                                        </th>
+                                    </tr>
+                                    <!-- ko template: { name: 'critterHeader', data: mother } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'soldierRow', foreach: armyMound, as: 'critter' }"></tbody>
+                                <tfoot data-bind="template: { name: 'critterRowEmpty', foreach: armyMoundEmpty }"></tfoot>
+                            </table>
+                            <div style="margin-top: 10px; font-weight: bold;" data-bind="visible: atWar">
+                                <div data-bind="visible: armyMound().length > 0">
+                                    Each troop is recieving a <span class="higher">1% critical hit chance per level</span>.
+                                </div>
+                                <div data-bind="visible: armyUpgrades().hasGeneral()">
+                                    Your troops are recieving a <span class="higher" data-bind="text: armyUpgrades().generalBonus() + '% hunting bonus'"></span> from your <span class="higher">General</span>.
+                                </div>
+                                <div data-bind="visible: nation().isDefeated()">
+                                    Your troops are recieving a <span class="higher">100% hunting bonus</span> from <span class="higher">controlling the enemy mound</span>.
+                                </div>
+                                <div data-bind="visible: nation().fortFound()">
+                                    Your troops are recieving a <span class="higher">50% hunting bonus</span> from <span class="higher">an abandoned fort</span>.
+                                </div>
+                                <div data-bind="visible: armyUpgrades().hasScout()">
+                                    Your troops are recieving a <span class="higher" data-bind="text: armyUpgrades().scoutBonus() + '% exploration bonus' "></span> from your <span class="higher">Scout</span>.
+                                </div>
+                                <div data-bind="visible: nation().isDefeated()">
+                                    Your troops are recieving a <span class="higher">100% exploration bonus</span> from <span class="higher">controlling the enemy mound</span>.
+                                </div>
+                                <div data-bind="visible: nation().exploreFound()">
+                                    Your troops are recieving a <span class="higher">50% exploration bonus</span> from <span class="higher">high ground</span>.
+                                </div>
+                                <div data-bind="visible: armyUpgrades().hasMedic()">
+                                    Your troops are recieving a <span class="higher" data-bind="text: armyUpgrades().medicBonus() + '% healing bonus'"></span> from your <span class="higher">Medic</span>.
+                                </div>
+                                <div data-bind="visible: armyUpgrades().strengthBonus() > 0">
+                                    Your troops are recieving a <span class="higher" data-bind="text: armyUpgrades().strengthBonus() + '% strength bonus'"></span> during battle from <span class="higher">artifacts</span>.
+                                </div>
+                                <div data-bind="visible: armyUpgrades().agilityBonus() > 0">
+                                    Your troops are recieving a <span class="higher" data-bind="text: armyUpgrades().agilityBonus() + '% agility bonus'"></span> during battle from <span class="higher">artifacts</span>.
+                                </div>
+                                <div data-bind="visible: armyUpgrades().biteBonus() > 0">
+                                    Your troops are recieving a <span class="higher" data-bind="text: armyUpgrades().biteBonus() + '% bite bonus'"></span> during battle from <span class="higher">artifacts</span>.
+                                </div>
+                                <div data-bind="visible: armyUpgrades().stingBonus() > 0">
+                                    Your troops are recieving a <span class="higher" data-bind="text: armyUpgrades().stingBonus() + '% sting bonus'"></span> during battle from <span class="higher">artifacts</span>.
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px; font-weight: bold;" data-bind="visible: !inBattle() && map().enemyArmyMound().length > 0">
+                                <div class="higher trait" data-bind="if: map().battleReport.won()">
+                                    The <span data-bind="text: map().battleReport.enemy"></span> was destroyed!
+                                </div>
+
+                                <div class="lower trait" data-bind="if: !map().battleReport.won()">
+                                    The <span data-bind="text: map().battleReport.enemy"></span> defeated our army!  There were no survivors.
+                                </div>
+                            </div>
+                        </td>
+                        <td style="vertical-align: top; width: 50%">
+                            <table data-bind="visible: inBattle()" class="critter enemyarmy" style="margin-top: 3px;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="8" class="noborder tableheader"><span data-bind="text: map().battleReport.enemy"></span></th>
+                                    </tr>
+                                    <!-- ko template: { name: 'critterHeader', data: mother } -->
+                                    <!-- /ko -->
+                                </thead>
+                                <tbody data-bind="template: { name: 'soldierRow', foreach: map().enemyArmyMound, as: 'critter' }"></tbody>
+                            </table>
+                            <div data-bind="visible: !inBattle() && !showTreasure()">
+                                <table data-bind="visible: atWar()" class="map" style="margin-top:4px;">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="15" class="noborder tableheader">
+                                                Map is <span data-bind="text: map().completePercentage() + ' finished'"></span>
+                                                <!-- ko if: nation() != undefined -->
+                                                <img title="Enemy Mound" data-bind="attr: { src: nation().isDefeated() ? 'Content/icons/redstar.png' : 'Content/icons/staroff.png'}" />
+                                                <img title="100% Explored" data-bind="attr: { src: nation().mapComplete() ? 'Content/icons/complete.png' : 'Content/icons/completeoff.png'}" />
+                                                <img title="Mine" data-bind="attr: { src: nation().mineFound() ? 'Content/icons/mine.png' : 'Content/icons/mineoff.png'}" />
+                                                <img title="Farm" data-bind="attr: { src: nation().farmFound() ? 'Content/icons/farm.png' : 'Content/icons/farmoff.png'}" />
+                                                <img title="Equipment" data-bind="attr: { src: nation().carryFound() ? 'Content/icons/carry.png' : 'Content/icons/carryoff.png'}" />
+                                                <img title="Factory" data-bind="attr: { src: nation().factoryFound() ? 'Content/icons/factory.png' : 'Content/icons/factoryoff.png'}" />
+                                                <img title="Boost" data-bind="attr: { src: nation().boostFound() ? 'Content/icons/heart.png' : 'Content/icons/heartoff.png'}" />
+                                                <img title="Gene" data-bind="attr: { src: nation().geneFound() ? 'Content/icons/bug.png' : 'Content/icons/bugoff.png'}" />
+                                                <img title="Fort" data-bind="attr: { src: nation().fortFound() ? 'Content/icons/fort.png' : 'Content/icons/fortoff.png'}" />
+                                                <img title="High Ground" data-bind="attr: { src: nation().exploreFound() ? 'Content/icons/zoom.png' : 'Content/icons/zoomoff.png'}" />
+                                                <img title="Artifact" data-bind="attr: { src: nation().treasuresFound() > 0 ? 'Content/icons/treasure.png' : 'Content/icons/treasureoff.png'}" />
+                                                <img title="Artifact" data-bind="attr: { src: nation().treasuresFound() > 1 ? 'Content/icons/treasure.png' : 'Content/icons/treasureoff.png'}" />
+                                                <img title="Artifact" data-bind="attr: { src: nation().treasuresFound() > 2 ? 'Content/icons/treasure.png' : 'Content/icons/treasureoff.png'}" />
+                                                <img title="Artifact" data-bind="attr: { src: nation().treasuresFound() > 3 ? 'Content/icons/treasure.png' : 'Content/icons/treasureoff.png'}" />
+                                                <!-- /ko -->
+                                            </th>
+                                            <th colspan="10" class="noborder" style="text-align: right;">
+                                                <button data-bind="click: $root.EndWar.bind($root), clickBubble: false">End War</button>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody data-bind="foreach: map().tiles()">
+                                        <tr data-bind="foreach: $data">
+                                            <td data-bind="text: danger() > 0 && extraClass() == '' ? danger() : '', class: isCleared() ? 'clear' + danger() + ' ' + extraClass() : 'fog' + ' ' + extraClass(), css: { unlocked: isUnlocked() && !isCleared()}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div data-bind="visible: !atWar()" style="margin-top:16px; text-align: center">
+                                    <div data-bind="foreach: nations">
+                                        <button class="war" data-bind="click: $root.StartWar.bind($root), enable: isUnlocked, css: {unlocked: isUnlocked}">
+                                            <div data-bind="text: name"></div>
+                                            <div class="info" data-bind="text: desc"></div>
+                                            <div class="info" data-bind="text: 'score ' + lowBaseValue + ' to ' + highBaseValue"></div>
+                                            <div style="margin-top: 5px">
+                                                <img title="Enemy Mound" data-bind="attr: { src: isDefeated() ? 'Content/icons/redstar.png' : 'Content/icons/staroff.png'}" />
+                                                <img title="100% Explored" data-bind="attr: { src: mapComplete() ? 'Content/icons/complete.png' : 'Content/icons/completeoff.png'}" />
+                                                <img title="Mine" data-bind="attr: { src: mineFound() ? 'Content/icons/mine.png' : 'Content/icons/mineoff.png'}" />
+                                                <img title="Farm" data-bind="attr: { src: farmFound() ? 'Content/icons/farm.png' : 'Content/icons/farmoff.png'}" />
+                                                <img title="Equipment" data-bind="attr: { src: carryFound() ? 'Content/icons/carry.png' : 'Content/icons/carryoff.png'}" />
+                                                <img title="Factory" data-bind="attr: { src: factoryFound() ? 'Content/icons/factory.png' : 'Content/icons/factoryoff.png'}" />
+                                                <img title="Boost" data-bind="attr: { src: boostFound() ? 'Content/icons/heart.png' : 'Content/icons/heartoff.png'}" /><br />
+                                                <img title="Gene" data-bind="attr: { src: geneFound() ? 'Content/icons/bug.png' : 'Content/icons/bugoff.png'}" />
+                                                <img title="Fort" data-bind="attr: { src: fortFound() ? 'Content/icons/fort.png' : 'Content/icons/fortoff.png'}" />
+                                                <img title="High Ground" data-bind="attr: { src: exploreFound() ? 'Content/icons/zoom.png' : 'Content/icons/zoomoff.png'}" />
+                                                <img title="Artifact" data-bind="attr: { src: treasuresFound() > 0 ? 'Content/icons/treasure.png' : 'Content/icons/treasureoff.png'}" />
+                                                <img title="Artifact" data-bind="attr: { src: treasuresFound() > 1 ? 'Content/icons/treasure.png' : 'Content/icons/treasureoff.png'}" />
+                                                <img title="Artifact" data-bind="attr: { src: treasuresFound() > 2 ? 'Content/icons/treasure.png' : 'Content/icons/treasureoff.png'}" />
+                                                <img title="Artifact" data-bind="attr: { src: treasuresFound() > 3 ? 'Content/icons/treasure.png' : 'Content/icons/treasureoff.png'}" />
+                                            </div>
+
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-bind="visible: !inBattle() && showTreasure()" style="margin-top: 50px; padding: 20px; text-align: center!important; display: block;">
+                                <h1 data-bind="text: treasureTitle"></h1>
+                                <h3 data-bind="text: treasureText"></h3>
+                                <button class="war unlocked" style="margin-top: 20px;" data-bind="click: $root.AcknowledgeTreasure.bind($root)">back to war</button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="tabs-achievements" class="tab" style="display:none">
+                <table cellspacing="10">
+                    <tr>
+                        <td style="width: 50%; padding: 5px; vertical-align: top;text-align: center;">
+                            <h4>Achievements</h4>
+                            <div data-bind="foreach: achievements">
+                                <div class="achievement" data-bind="css: { unlocked: isUnlocked}">
+                                    <div class="name" data-bind="text: name"></div>
+                                    <div class="desc" data-bind="text: desc"></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="tabs-information" class="tab" style="display:none">
+                <table cellspacing="10">
+                    <tr>
+                        <td style="width: 50%; padding: 5px; vertical-align: top;">
+                            <h4>How To Play</h4>
+
+                            <p>
+                                <strong>Questions & Discussion at <a href="http://www.reddit.com/r/crittermound">www.reddit.com/r/crittermound</a></strong><br />
+                            </p>
+                            <p>
+                                <strong>General</strong><br />
+                                Breed new critters, breed stronger critters, destroy your enimies.
+                            </p>
+
+                            <p>
+                                <strong>Quick Guide</strong><br />
+                                <ol>
+                                    <li>Wait for new critters in the hatchery</li>
+                                    <li>If they are mostly green, use them as King and Queen</li>
+                                    <li>Put red critters to work as a workers</li>
+                                    <li>Put 1 critter to work as a soilder</li>
+                                    <li>Start a war</li>
+                                    <li>Repeat 1 and 2 until you are strong enough to win the war</li>
+                                </ol>
+                            </p>
+
+                            <p>
+                                <strong>Hatchery</strong><br />
+                                The hatcheries are where the King and Queen produce new offspring.  Any egg in the hatchery can become anything, the new King, a Mine Worker, or Military.
+                                Once assigned a job it can not be changed.  You can tell a building how to prioritize with the dropdown.  It won't change what is produced, just who is kicked out
+                                when there isn't enough space (the eggs are just tossed out of the mound).  Boost causes an instant mating, and recharges over time.
+                            </p>
+
+                            <p>
+                                <strong>Traits and Mutations</strong><br />
+                                The traits vary during each breeding, and are used in various calculations.  In general, a trait varies within it's parents range.  If the mother is 10 and the
+                                father is 15, then the offspring will be between 9 and 16.  The variance increases as the trait increases.  Randomly, some critters will mutate as they are improved.  Mutation can increase a
+                                traits value with a bonus.  Mutations breed the same as traits.  You can also find new mutations by going to war.
+                            </p>
+                            <p>
+                                <strong>Vitality</strong><br />
+                                Vitality controls health, and how well a critter produces sod in the factory
+                            </p>
+                            <p>
+                                <strong>Strength</strong><br />
+                                Strength gives 50% of it's value as a bonus to bite during battle, and as a worker, controls how much a critter can carry.
+                            </p>
+                            <p>
+                                <strong>Agility</strong><br />
+                                Agility controls how fast a critter breeds, works, and fighting order.  It also provides 50% of it's value as a bonus to string during battle.
+                            </p>
+                            <p>
+                                <strong>Bite</strong><br />
+                                Bite is both an attack and defense, it's also how a critter farms grass.
+                            </p>
+                            <p>
+                                <strong>Sting</strong><br />
+                                Sting is both an attack and defense, it's also how a critter mines dirt.
+                            </p>
+                            <p>
+                                <strong>Bite vs Sting</strong><br />
+                                These two traits are opposed to eachother.   They are both an attack and they are both a defense.  When each critter attacks it will choose one or the other at random,
+                                and it's opponet will counter the opposite.  Bite attacks Sting, Sting defends Bite, ect.
+                            </p>
+                            <p>
+                                <strong>Stats</strong><br />
+                                Stats are calculations made using trait values.  They are what matter in the game.  Health is 15 * Vitality for example.
+                            </p>
+
+                            <strong>Mutation Expression</strong><br />
+                            <table class="critter">
+                                <tr>
+                                    <th style="width: 25%">parents</th>
+                                    <th style="width: 25%">none</th>
+                                    <th style="width: 25%">recessive</th>
+                                    <th style="width: 25%">expressed</th>
+                                </tr>
+                                <tr><td>None / None</td><td>99%</td><td>1%</td><td>0%</td></tr>
+                                <tr><td>None / Recessive</td><td>50%</td><td>50%</td><td>0%</td></tr>
+                                <tr><td>None / Expressed</td><td>0%</td><td>100%</td><td>0%</td></tr>
+                                <tr><td>Recessive / Recessive</td><td>25%</td><td>50%</td><td>25%</td></tr>
+                                <tr><td>Recessive / Expressed</td><td>0%</td><td>50%</td><td>50%</td></tr>
+                                <tr><td>Expressed / Expressed</td><td>0%</td><td>0%</td><td>100%</td></tr>
+                            </table>
+
+                            <p>
+                                <strong>Workers</strong><br />
+                                When a critter is promoted to a worker, he is assigned to the job where he is currently needed most, that he can help in.  If the mine needs help the most, that is where he will
+                                go if he can improve the mines production.  If he can't help at the bottle neck, he goes where he can help.  If he can't help he... leaves the colony and goes to... somewhere else.
+                                If you have 100 strength and a 20 second speed, you'll mine 100 dirt every 20 seconds.
+                            </p>
+
+                            <p>
+                                <strong>Barracks</strong><br />
+                                The barracks hosts your army.  When you are at war, they defend your mound, and search the surrounding area for enemies to gain territory.  You can leave a war at anytime,
+                                but your map will be lost.  Because the ancient map makers... its just too much data to store, alright.   So ending a war means you'll have to start over if you revisit.
+                            </p>
+                            <p>
+                                <strong>Soldier Ranks</strong><br />
+                                The three highest ranked soldiers are special.  They become your General, your Scout, and your Medic in that order.  If one is killed, or a higher ranking officer, they adjust to new rolls.
+                                Soldiers below this still can XP and will be promoted if needed.  All soldiers get a critical change bonus equal to their level (Level 10 = 10% chance).
+                            </p>
+
+                            <p data-bind="visible: isHeirsUnlocked">
+                                <strong>Heir Hatchery</strong><br />
+                                You have become so rich, that you can now help a new mound get off it's feet.  However, they don't yet have their own home.  They'll need sod to create offspring.  (Sod = Score)
+                                You can use the <strong>shift key</strong> to cross promote between the royals and their heirs.
+                            </p>
+
+                            <p><strong>The shift key changes the function of some of the buttons, and it also lets you lock a critter so it won't be pushed from a mound.</strong></p>
+                        </td>
+                        <td style="width: 50%; padding: 5px; vertical-align: top;">
+                            <button onclick="Reset()">reset game / delete save</button>
+                            <br /><br />
+                            <button data-bind="click: $root.Save.bind($root), clickBubble: false">save game</button> |
+                            <button onclick="Export()">export game</button>
+                            <button onclick="ShowImport()">import game</button>
+                            <br /><br />
+                            <b>Battle Speed:</b> <span data-bind="text: battleTurnLength() / 20"></span> seconds<br />
+                            <input style="width: 100%" type="range" min="2" max="60" data-bind="value: battleTurnLength">
+                            <br /><br />
+                            <h4>Release Notes</h4>
+                            <p>
+                                <strong>1.1.4 - Sep 9th, 2014</strong><br />
+                                <ul>
+                                    <li>Fixed Heir Mound cost</li>
+                                    <li>Forts show up on map always</li>
+                                    <li>Soldiers can level up to 25</li>
+                                    <li>Bug Fixes</li>
+                                </ul>
+                                <strong>1.1.3 - Sep 7th, 2014</strong><br />
+                                <ul>
+                                    <li>Defeating the enemy mound provides a bonus to hunting and exploring</li>
+                                    <li>Added base and bonus filters (total base or total bonus % across all traits)</li>
+                                    <li>Bug Fixes</li>
+                                </ul>
+                                <strong>1.1.2 - Sep 6th, 2014</strong><br />
+                                <ul>
+                                    <li>Locked maxed out traits and mutations, they won't lose value after reaching highest possible point</li>
+                                    <li>Sort order of the army determines promotions, not level.</li>
+                                    <li>Bug Fixes</li>
+                                </ul>
+                                <strong>1.1.1 - Sep 5th, 2014</strong><br />
+                                <ul>
+                                    <li>New Score Function</li>
+                                    <li>Bug Fixes</li>
+                                </ul>
+                                <strong>1.1 - Sep 4th, 2014</strong><br />
+                                <ul>
+                                    <li>Army ranks and jobs.</li>
+                                    <li>Added Forts</li>
+                                    <li>Fixed bug that let idle players gain multiple mutations</li>
+                                    <li>Added Export / Import</li>
+                                </ul>
+                                <strong>1.0 - Aug 30th, 2014</strong><br />
+                                <ul>
+                                    <li>Production completely overhauled</li>
+                                    <li>Added requirements to obtain new mutations.   They'll need to be improved to become eligible to mutate again.  So you can't just ignore existing mutations and get more.</li>
+                                    <li>Shift key allows "all" commands for the mounds such as "Recycle All"</li>
+                                    <li>Changed some multipliers on enemy types.  Again, it'll be harder.</li>
+                                    <li>Speed changes related to Vitality have changed.  It'll increase faster at lower levels.</li>
+                                </ul>
+                                <strong>0.4 - Aug 23th, 2014</strong><br />
+                                <ul>
+                                    <li>Fixed Wars.  They now save and unlock properly, so you can find everything.   New item type increases max boosts.</li>
+                                    <li>Critters can die in battle if their health reaches zero</li>
+                                    <li>The enemy no longer attacks you.  Your army when not fighting, sends a scout to unlocked tiles to take a look.</li>
+                                    <li>Shift click locks a critter so it won't sort out of the hatchery</li>
+                                </ul>
+                                <strong>0.3 - Aug 19th, 2014</strong><br />
+                                <ul>
+                                    <li>Added Wars.  While at war, but enemy still attacks, but never with an ememy stronger than you haven't already defeated.  There are now new genes, mines, and artifacts to discover.</li>
+                                    <li>Added Achievements</li>
+                                </ul>
+                                <strong>0.2 - Aug 12th, 2014</strong><br />
+                                <ul>
+                                    <li>Got the barracks working although it may need to be balanced. Enemy strength is based off your current generation number, so the battles can be easy or hard.</li>
+                                    <li>Move commands now are group selectable, and the army can be killed to provide fine tuned replacement</li>
+                                    <li>Added click to boost buttons on the timers</li>
+                                </ul>
+
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <h4 style="margin-top: 25px; text-align: center!important">Press <img src="Content/icons/shiftkey.gif" style="vertical-align: text-bottom" title="Shift Key" /> to see more options</h4>
+
+    </div>
+
+    <script id="critterHeader" type="text/html">
+        <tr>
+            <th style="width: 40px;">
+            </th>
+            <th class="traitcell">score</th>
+            <!-- ko foreach: traits -->
+            <th class="traitcell" data-bind="text: name, attr: {title: name}"></th>
+            <!-- /ko -->
+        </tr>
+    </script>
+
+    <script id="workerHeader" type="text/html">
+        <tr>
+            <th style="width: 40px;">
+            </th>
+            <th class="traitcell">score</th>
+            <th class="traitcell">factory</th>
+            <th class="traitcell">carrying</th>
+            <th class="traitcell">speed</th>
+            <th class="traitcell">farming</th>
+            <th class="traitcell">mining</th>
+        </tr>
+    </script>
+
+    <script id="critterRowEmpty" type="text/html">
+        <tr class="health dead">
+            <td class="health noborder" colspan="8">
+                <div>&nbsp;</div>
+            </td>
+        </tr>
+        <tr class="critterRow dead">
+            <td style="width: 40px;">&nbsp;</td>
+            <td class="traitcell">&nbsp;</td>
+            <td class="traitcell">&nbsp;</td>
+            <td class="traitcell">&nbsp;</td>
+            <td class="traitcell">&nbsp;</td>
+            <td class="traitcell">&nbsp;</td>
+            <td class="traitcell">&nbsp;</td>
+        </tr>
+    </script>
+
+    <script id="scoreTip" type="text/html">
+        <div style="display:none;" data-bind="attr: {'id': 'critter_tip_' + critter.id + '_score' }">
+            <table class="critter" style="width: 200px;">
+                <thead>
+                    <tr>
+                        <th colspan="3" class="noborder">information</th>
+                    </tr>
+                    <tr>
+                        <th>stat</th>
+                        <th>value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Generation</td>
+                        <td data-bind="text: generation"></td>
+                    </tr>
+                    <tr>
+                        <td>Birth Order</td>
+                        <td data-bind="text: id"></td>
+                    </tr>
+                    <tr data-bind="visible: job === 3">
+                        <td>Experience</td>
+                        <td data-bind="text: experience"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="critter" style="width: 200px;margin-top: 10px">
+                <thead>
+                    <tr>
+                        <th colspan="3" class="noborder">metrics</th>
+                    </tr>
+                    <tr>
+                        <th>score</th>
+                        <th>value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Total Score</td>
+                        <td data-bind="text: gameFormatNumber(score)"></td>
+                    </tr>
+                    <tr>
+                        <td>Total Base</td>
+                        <td data-bind="text: gameFormatNumber(baseScore)"></td>
+                    </tr>
+                    <tr>
+                        <td>Total Bonus</td>
+                        <td data-bind="text: gameFormatNumber(bonusScore)"></td>
+                    </tr>
+                    <tr>
+                        <td>Mutations</td>
+                        <td data-bind="text: totalMutations"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </script>
+
+    <script id="traitTip" type="text/html">
+        <div style="display:none;" data-bind="attr: {'id': 'critter_tip_' + critter.id + '_' + name }">
+            <table class="critter" style="width: 200px;">
+                <thead>
+                    <tr>
+                        <th colspan="3" class="noborder" data-bind="text: name"></th>
+                    </tr>
+                    <tr>
+                        <th>base</th>
+                        <th>bonus</th>
+                        <th>value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-bind="text: gameFormatNumber(base)"></td>
+                        <td data-bind="text:  bonus >= 0 ? ' + ' + bonus + '%' : ' - ' + Math.abs(bonus) + '%'"></td>
+                        <td data-bind="text: gameFormatNumber(value)"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table data-bind="if: stats.length > 0" class="critter" style="width: 200px; margin-top: 10px">
+                <thead>
+                    <tr>
+                        <th colspan="3" class="noborder" data-bind="text: name + ' stats'"></th>
+                    </tr>
+                    <tr>
+                        <th>name</th>
+                        <th>value</th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: stats">
+                    <tr>
+                        <td data-bind="text: name"></td>
+                        <td data-bind="text: value"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table data-bind="if: genes.length > 0" class="critter" style="width: 200px; margin-top: 10px">
+                <thead>
+                    <tr>
+                        <th colspan="3" class="noborder" data-bind="text: name + ' mutations'"></th>
+                    </tr>
+                    <tr>
+                        <th>name</th>
+                        <th>status</th>
+                        <th>value</th>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: genes">
+                    <tr>
+                        <td data-bind="text: name, css: { dominate: expression == 2, recessive: expression == 1, flaw: !good}"></td>
+                        <td class="tipped" data-bind="text: expression == 1 ? 'Rec.' : 'Exp.', css: { dominate: expression == 2, recessive: expression == 1, flaw: !good, lower: expression == 2 && !good}"></td>
+                        <td data-bind="text: good ? ' + ' + value + '%' : ' - ' + value + '%', css: { dominate: expression == 2, recessive: expression == 1, flaw: !good, lower: expression == 2 && !good}"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table data-bind="if: genes.length == 0" class="critter" style="width: 200px;">
+                <thead>
+                    <tr>
+                        <th colspan="3" class="noborder" data-bind="text: 'no ' + name + ' mutations'"></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </script>
+
+    <script id="critterRow" type="text/html">
+        <tr class="health">
+            <td class="health noborder" colspan="8">
+                <div data-bind="style: { width: healthPercentage }">&nbsp;</div>
+            </td>
+        </tr>
+        <tr class="critterRow" data-bind="css: { selected: isSelected, alt: $index()%2, newest: $root.newestBorn() === id}">
+            <td style="width: 40px;">
+                <img class="image" data-bind="visible: isSelected" src="Content/icons/tick.png" />
+                <img class="image" data-bind="visible: isLocked" src="Content/icons/lock.png" />
+                <img class="image" data-bind="visible: gender === 0" title="Female" src="Content/icons/female.png" />
+                <img class="image" data-bind="visible: gender === 1" title="Male" src="Content/icons/male.png" />
+            </td>
+            <td class="tipped traitcell" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_score\''}">
+                <div class="trait" data-bind="text: gameFormatNumber(score), css: { higher: (job === 1 && ((gender === 0 && score> $root.mother().score) || (gender === 1 && score > $root.father().score))) || (job === 5 && ((gender === 0 && score> $root.princess().score) || (gender === 1 && score > $root.prince().score))), lower: (job === 1 && ((gender === 0 && score < $root.mother().score) || (gender === 1 && score < $root.father().score))) || (job === 5 && ((gender === 0 && score < $root.princess().score) || (gender === 1 && score < $root.prince().score))) }"></div>
+                <!-- ko template: { name: 'scoreTip', data: $data } -->
+                <!-- /ko -->
+            </td>
+            <!-- ko foreach: traits -->
+            <td class="tipped traitcell" data-bind="css: {attackTrait: $root.battleAttackerTrait() == type, defendTrait: $root.battleDefenderTrait() == type}, attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + $parent.id + '_' + name + '\''}">
+                <div class="trait">
+                    <span data-bind="text: gameFormatNumber(base), css: { higher: ($parent.job === 1 && (($parent.gender === 0 && base > $root.mother().traits[$index()].base) || ($parent.gender === 1 && base > $root.father().traits[$index()].base))) || ($parent.job === 5 && (($parent.gender === 0 && base > $root.princess().traits[$index()].base) || ($parent.gender === 1 && base > $root.prince().traits[$index()].base))), lower: ($parent.job === 1 && (($parent.gender === 0 && base < $root.mother().traits[$index()].base) || ($parent.gender === 1 && base < $root.father().traits[$index()].base))) || ($parent.job === 5 && (($parent.gender === 0 && base < $root.princess().traits[$index()].base) || ($parent.gender === 1 && base < $root.prince().traits[$index()].base)))}"></span>
+                    <span data-bind="if: bonus != 0">
+                        <span data-bind="text: bonus >= 0 ? ' + ' + bonus + '%' : ' - ' + Math.abs(bonus) + '%', css: { higher: ($parent.job === 1 && (($parent.gender === 0 &&  bonus > $root.mother().traits[$index()].bonus) || ($parent.gender === 1 && bonus > $root.father().traits[$index()].bonus))) || ($parent.job === 5 && (($parent.gender === 0 &&  bonus > $root.princess().traits[$index()].bonus) || ($parent.gender === 1 && bonus > $root.prince().traits[$index()].bonus))), lower: ($parent.job === 1 && (($parent.gender === 0 && bonus < $root.mother().traits[$index()].bonus) || ($parent.gender === 1 && bonus < $root.father().traits[$index()].bonus))) ||  ($parent.job === 5 && (($parent.gender === 0 && bonus < $root.princess().traits[$index()].bonus) || ($parent.gender === 1 && bonus < $root.prince().traits[$index()].bonus))) }"></span>
+                    </span>
+                </div>
+                <div style="margin-top: 2px;" class="imageleftandtext" data-bind="visible: ($parent.job !== 4 && value >= 25) || genes.length > 0, css: { higher: ($parent.job === 1 && (($parent.gender === 0 && genes.length > $root.mother().traits[$index()].genes.length) || ($parent.gender === 1 && genes.length > $root.father().traits[$index()].genes.length))) || ($parent.job === 5 && (($parent.gender === 0 && genes.length > $root.princess().traits[$index()].genes.length) || ($parent.gender === 1 && genes.length > $root.prince().traits[$index()].genes.length))), lower: ($parent.job === 1 && (($parent.gender === 0 && genes.length < $root.mother().traits[$index()].genes.length) || ($parent.gender === 1 && genes.length < $root.father().traits[$index()].genes.length))) || ($parent.job === 5 && (($parent.gender === 0 && genes.length < $root.princess().traits[$index()].genes.length) || ($parent.gender === 1 && genes.length < $root.prince().traits[$index()].genes.length))), dim: genes.length == 0 }">
+                    <span data-bind="text: genes.length"></span>
+                    <span data-bind="text: genes.length == 1 ? ' Mutation' : ' Mutations'"></span>
+                    <span data-bind="if: mutation"><img class="image" title="New Mutation" src="Content/icons/new.png" /></span>
+                </div>
+            </td>
+            <!-- ko template: { name: 'traitTip', data: $data } -->
+            <!-- /ko -->
+            <!-- /ko -->
+        </tr>
+    </script>
+
+    <script id="workerRow" type="text/html">
+        <tr>
+            <td class="health noborder" colspan="8">
+                <div data-bind="style: { width: healthPercentage }">&nbsp;</div>
+            </td>
+        </tr>
+        <tr class="critterRow" data-bind="css: { selected: isSelected, alt: $index()%2 }">
+            <td style="width: 40px;">
+                <img class="image" data-bind="visible: isSelected" src="Content/icons/tick.png" />
+                <img class="image" data-bind="visible: gender === 0" title="Female" src="Content/icons/female.png" />
+                <img class="image" data-bind="visible: gender === 1" title="Male" src="Content/icons/male.png" />
+            </td>
+            <td class="traitcell trait tipped" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_score\''}">
+                <div class="trait" data-bind="text: gameFormatNumber(score)"></div>
+            </td>
+            <!-- ko template: { name: 'scoreTip', data: $data } -->
+            <!-- /ko -->
+
+            <td class="traitcell factory tipped" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_vitality\''}">
+                <div class="trait">
+                    <span data-bind="text: gameFormatNumber(sodPerSecond)"></span>
+                    <span class="higher" data-bind="text: '+' + $root.bonusFactoryPercent() + '%', visible: $root.bonusFactoryPercent() > 0"></span>
+                </div>
+                <div class="imageleftandtext" style="margin-top: 2px;">Vitality</div>
+            </td>
+            <!-- ko template: { name: 'traitTip', data: traits[0] } -->
+            <!-- /ko -->
+            <td class="traitcell carry tipped" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_strength\''}">
+                <div class="trait">
+                    <span data-bind="text: gameFormatNumber(carryPerSecond)"></span>
+                    <span class="higher" data-bind="text: '+' + $root.bonusCarrierPercent() + '%', visible: $root.bonusCarrierPercent() > 0"></span>
+                </div>
+                <div class="imageleftandtext" style="margin-top: 2px;">Strength</div>
+            </td>
+            <!-- ko template: { name: 'traitTip', data: traits[1] } -->
+            <!-- /ko -->
+
+            <td class="traitcell tipped mine farm carry factory" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_agility\''}">
+                <div class="trait" data-bind="text: actionTimeSeconds + ' sec.'"></div>
+                <div class="imageleftandtext" style="margin-top: 2px;">Agility</div>
+            </td>
+            <!-- ko template: { name: 'traitTip', data: traits[2] } -->
+            <!-- /ko -->
+
+            <td class="traitcell farm tipped" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_bite\''}">
+                <div class="trait">
+                    <span data-bind="text: gameFormatNumber(grassPerSecond)"></span>
+                    <span class="higher" data-bind="text: '+' + $root.bonusFarmPercent() + '%', visible: $root.bonusFarmPercent() > 0"></span>
+                </div>
+                <div class="imageleftandtext" style="margin-top: 2px;">Bite</div>
+            </td>
+            <!-- ko template: { name: 'traitTip', data: traits[3] } -->
+            <!-- /ko -->
+
+            <td class="traitcell mine tipped" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_sting\''}">
+                <div class="trait">
+                    <span data-bind="text: gameFormatNumber(dirtPerSecond)"></span>
+                    <span class="higher" data-bind="text: '+' + $root.bonusMinePercent() + '%', visible: $root.bonusMinePercent() > 0"></span>
+                </div>
+                <div class="imageleftandtext" style="margin-top: 2px;">Sting</div>
+            </td>
+            <!-- ko template: { name: 'traitTip', data: traits[4] } -->
+            <!-- /ko -->
+
+        </tr>
+    </script>
+
+
+    <script id="soldierRow" type="text/html">
+        <tr class="health" data-bind="css: {defenderHealth: $root.battleDefenderId() === id}">
+            <td class="health noborder" colspan="8">
+                <div data-bind="style: { width: healthPercentage }">&nbsp;</div>
+            </td>
+        </tr>
+        <tr class="critterRow" data-bind="css: { selected: isSelected, attacker: $root.battleAttackerId() === id, defender: $root.battleDefenderId() === id, dead: (job === 3 || job === 4) && currentHealth() <= 0, alt: $index()%2 }">
+            <td style="width: 40px;">
+                <img class="image" data-bind="visible: isSelected" src="Content/icons/tick.png" />
+                <img class="image" data-bind="visible: gender === 0" title="Female" src="Content/icons/female.png" />
+                <img class="image" data-bind="visible: gender === 1" title="Male" src="Content/icons/male.png" />
+            </td>
+            <td class="tipped traitcell" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_score\''}">
+                <div class="trait" data-bind="text: gameFormatNumber(score), css: { higher: (job === 1 && ((gender === 0 && score> $root.mother().score) || (gender === 1 && score > $root.father().score))) || (job === 5 && ((gender === 0 && score> $root.princess().score) || (gender === 1 && score > $root.prince().score))), lower: (job === 1 && ((gender === 0 && score < $root.mother().score) || (gender === 1 && score < $root.father().score))) || (job === 5 && ((gender === 0 && score < $root.princess().score) || (gender === 1 && score < $root.prince().score))) }"></div>
+                <div class="imageleftandtext" style="margin-top: 3px" data-bind="text: 'Lvl ' + level() + ' ' + rank(), visible: job === 3"></div>
+                <!-- ko template: { name: 'scoreTip', data: $data } -->
+                <!-- /ko -->
+            </td>
+
+            <td class="traitcell tipped" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_vitality\''}">
+                <div class="trait">
+                    <span data-bind="text: gameFormatNumber(Math.floor(currentHealth()))"></span>
+                </div>
+                <div class="imageleftandtext" style="margin-top: 2px;">Health</div>
+            </td>
+            <!-- ko template: { name: 'traitTip', data: traits[0] } -->
+            <!-- /ko -->
+            <td class="traitcell tipped" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_strength\''}">
+                <div class="trait">
+                    <span data-bind="text: gameFormatNumber(traits[1].trueValue)"></span>
+                </div>
+                <div class="imageleftandtext" style="margin-top: 2px;" data-bind="visible: job === 3, text: '+' + $root.armyUpgrades().strengthBonus() + '% artifacts', css: {higher: $root.armyUpgrades().strengthBonus() > 0 }"></div>
+            </td>
+            <!-- ko template: { name: 'traitTip', data: traits[1] } -->
+            <!-- /ko -->
+
+            <td class="traitcell tipped" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_agility\''}">
+                <div class="trait">
+                    <span data-bind="text: gameFormatNumber(traits[2].trueValue)"></span>
+                </div>
+                <div class="imageleftandtext" style="margin-top: 2px;" data-bind="visible: job === 3, text: '+' + $root.armyUpgrades().agilityBonus() + '% artifacts', css: {higher: $root.armyUpgrades().agilityBonus() > 0 }"></div>
+            </td>
+            <!-- ko template: { name: 'traitTip', data: traits[2] } -->
+            <!-- /ko -->
+
+            <td class="traitcell tipped" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_bite\''}">
+                <div class="trait">
+                    <span data-bind="text: gameFormatNumber(traits[3].trueValue)"></span>
+                </div>
+                <div class="imageleftandtext" style="margin-top: 2px;" data-bind="visible: job === 3, text: '+' + $root.armyUpgrades().biteBonus() + '% artifacts', css: {higher: $root.armyUpgrades().biteBonus() > 0 }"></div>
+            </td>
+            <!-- ko template: { name: 'traitTip', data: traits[3] } -->
+            <!-- /ko -->
+
+            <td class="traitcell tipped" data-bind="attr: { 'data-tipped-options': 'inline: ' + '\'critter_tip_' + id + '_sting\''}">
+                <div class="trait">
+                    <span data-bind="text: gameFormatNumber(traits[4].trueValue)"></span>
+                </div>
+                <div class="imageleftandtext" style="margin-top: 2px;" data-bind="visible: job === 3, text: '+' + $root.armyUpgrades().stingBonus() + '% artifacts', css: {higher: $root.armyUpgrades().stingBonus() > 0 }"></div>
+            </td>
+            <!-- ko template: { name: 'traitTip', data: traits[4] } -->
+            <!-- /ko -->
+
+        </tr>
+    </script>
+
+    <div id="export" class="modal" style="display: none;">
+        <button style="float: right" class="simplemodal-close">Close</button>
+        <h4>Export Game</h4>
+        <textarea id="txtExport" rows="10" cols="75"></textarea>
+    </div>
+    <div id="import" class="modal" style="display: none;">
+        <div style="float: right">
+            <button class="simplemodal-close">Cancel</button>
+            <button onclick="Import()" class="simplemodal-close">Import</button>
+        </div>
+
+        <h4>Import Game</h4>
+        <textarea id="txtImport" rows="10" cols="75"></textarea>
+    </div>
+    <!--<script src="Scripts/game.scramble.js"></script>-->
+    <script src="Scripts/Game.js"></script>
+    <script src="Scripts/Site.js"></script>
+</body>
+
+</html>
