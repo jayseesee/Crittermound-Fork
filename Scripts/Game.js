@@ -877,31 +877,31 @@ var ticksPerSecond=20,game,GameController=function()
 		{
 		switch(n)
 			{
-			case"FemaleHatchery":if(this.maxFemaleMoundSize()>=9)return;
+			case"FemaleHatchery":if(this.maxFemaleMoundSize()>=10)return;
 			this.Buy(this.femaleMoundUpgradeCost(),"Female Hatchery Upgrade")&&this.maxFemaleMoundSize(this.maxFemaleMoundSize()+1);
 			break;
-			case"MaleHatchery":if(this.maxMaleMoundSize()>=9)return;
+			case"MaleHatchery":if(this.maxMaleMoundSize()>=10)return;
 			this.Buy(this.maleMoundUpgradeCost(),"Male Hatchery Upgrade")&&this.maxMaleMoundSize(this.maxMaleMoundSize()+1);
 			break;
-			case"PrinceHatchery":if(this.maxPrinceMoundSize()>=9)return;
+			case"PrinceHatchery":if(this.maxPrinceMoundSize()>=10)return;
 			this.Buy(this.princeMoundUpgradeCost(),"Prince Hatchery Upgrade")&&this.maxPrinceMoundSize(this.maxPrinceMoundSize()+1);
 			break;
-			case"PrincessHatchery":if(this.maxPrincessMoundSize()>=9)return;
+			case"PrincessHatchery":if(this.maxPrincessMoundSize()>=10)return;
 			this.Buy(this.princessMoundUpgradeCost(),"Princess Hatchery Upgrade")&&this.maxPrincessMoundSize(this.maxPrincessMoundSize()+1);
 			break;
-			case"Mine":if(this.maxMineMoundSize()>=9)return;
+			case"Mine":if(this.maxMineMoundSize()>=10)return;
 			this.Buy(this.mineMoundUpgradeCost(),"Mine Upgrade")&&this.maxMineMoundSize(this.maxMineMoundSize()+1);
 			break;
-			case"Farm":if(this.maxFarmMoundSize()>=9)return;
+			case"Farm":if(this.maxFarmMoundSize()>=10)return;
 			this.Buy(this.farmMoundUpgradeCost(),"Farm Upgrade")&&this.maxFarmMoundSize(this.maxFarmMoundSize()+1);
 			break;
-			case"Carrier":if(this.maxCarrierMoundSize()>=9)return;
+			case"Carrier":if(this.maxCarrierMoundSize()>=10)return;
 			this.Buy(this.carrierMoundUpgradeCost(),"Carrier Upgrade")&&this.maxCarrierMoundSize(this.maxCarrierMoundSize()+1);
 			break;
-			case"Factory":if(this.maxFactoryMoundSize()>=9)return;
+			case"Factory":if(this.maxFactoryMoundSize()>=10)return;
 			this.Buy(this.factoryMoundUpgradeCost(),"Factory Upgrade")&&this.maxFactoryMoundSize(this.maxFactoryMoundSize()+1);
 			break;
-			case"Army":if(this.maxArmyMoundSize()>=9)return;
+			case"Army":if(this.maxArmyMoundSize()>=10)return;
 			this.Buy(this.armyMoundUpgradeCost(),"Barracks Upgrade")&&this.maxArmyMoundSize(this.maxArmyMoundSize()+1)
 		}
 	}
