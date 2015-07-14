@@ -47,7 +47,7 @@ var ticksPerSecond=20,game,GameController=function()
 		this.princessSort=ko.observable("score");
 		this.princeSort=ko.observable("score");
 		this.newGeneChanceRange=1e3;
-		this.traitMax=9999;
+		this.traitMax=999999;
 		this.geneMax=100;
 		this.missNewGene=ko.observable(0);
 		this.newGeneChance=ko.computed(function()
@@ -385,10 +385,10 @@ var ticksPerSecond=20,game,GameController=function()
 		this.nations.push(new Nation(3,2,"wasps","high sting",3e3,5e3,5,5,2));
 		this.nations.push(new Nation(4,2,"scorpions","high sting",5e4,75e3,8,3,3));
 		this.nations.push(new Nation(9,1,"beetles","high bite",200,300,2,5,1));
-		this.nations.push(new Nation(10,1,"horseflys","high bite",5e3,7500,5,9,2));
+		this.nations.push(new Nation(10,1,"horseflies","high bite",5e3,7500,5,9,2));
 		this.nations.push(new Nation(11,1,"termites","high bite",75e3,1e5,8,10,3));
 		this.nations.push(new Nation(12,3,"ticks","high health",300,500,3,9,1));
-		this.nations.push(new Nation(13,3,"mosquitos","high health",7500,1e4,6,12,2));
+		this.nations.push(new Nation(13,3,"mosquitoes","high health",7500,1e4,6,12,2));
 		this.nations.push(new Nation(14,3,"leeches","high health",1e5,125e3,9,13,3));
 		this.nations.push(new Nation(8,5,"centipedes","solo fighter",500,1e3,3,12,1));
 		this.nations.push(new Nation(7,5,"praying mantis","solo fighter",1e4,15e3,6,8,2));
@@ -939,7 +939,7 @@ var ticksPerSecond=20,game,GameController=function()
 		var n,t;
 		if(this.armyMound().length==0)
 			{
-			$(".tabcontents").notify("You should assign some soilders to the barracks before starting a fight","error");
+			$(".tabcontents").notify("You should assign some soldiers to the barracks before starting a fight","error");
 			return
 		}
 		for(this.showTreasure(!1),this.inBattle(!0),this.map().CreateArmy(),n=0;
@@ -1874,19 +1874,19 @@ var AchievementCount=function()
 				break;
 				case 11:this.battleReport.enemy("Nest of Termites");
 				break;
-				case 10:this.battleReport.enemy("Stable of Horseflys");
+				case 10:this.battleReport.enemy("Stable of Horseflies");
 				break;
 				case 16:this.battleReport.enemy("Colony of Ants");
 				break;
 				case 8:this.battleReport.enemy("Centipede Gladiator");
 				break;
-				case 7:this.battleReport.enemy("Praying Mantis Assassian");
+				case 7:this.battleReport.enemy("Praying Mantis Assassin");
 				break;
 				case 15:this.battleReport.enemy("Army of Crickets");
 				break;
 				case 14:this.battleReport.enemy("Lair of Leeches");
 				break;
-				case 13:this.battleReport.enemy("Scourge of Mosquitos")
+				case 13:this.battleReport.enemy("Scourge of Mosquitoes")
 			}
 			this.battleReport.enemy("Level "+o+" "+this.battleReport.enemy());
 			c=o;
@@ -2033,7 +2033,7 @@ var BattleMoundIndex=function()
 	}
 	return n
 }
-(),availableGenes=[new Gene(0,0,1,"Limb Regen",0,!0),new Gene(1,0,1,"Biologic Immortal",0,!0),new Gene(2,0,1,"Fast Clotting",0,!0),new Gene(3,0,1,"High Metabolism",0,!0),new Gene(4,0,1,"Reduced Aging",0,!0),new Gene(5,0,1,"Hardened Carapace",0,!0),new Gene(6,0,1,"Vigorous",0,!0),new Gene(7,0,1,"Redundant Organs",0,!0),new Gene(8,0,1,"Exoskeleton",0,!0),new Gene(9,0,1,"Carapace Regen",0,!0),new Gene(10,0,1,"Iron Skin",0,!0),new Gene(11,0,1,"Detachable Tail",0,!0),new Gene(12,0,1,"Ancient Blood",0,!0),new Gene(13,0,1,"Lucky",0,!0),new Gene(14,0,1,"Guardian Angel",0,!0),new Gene(15,0,1,"Replaceable Organs",0,!0),new Gene(100,1,1,"Big Boned",0,!0),new Gene(101,1,1,"Gigantism",0,!0),new Gene(102,1,1,"Increased Mass",0,!0),new Gene(103,1,1,"Berserk Instinct",0,!0),new Gene(104,1,1,"Elastic Tendons",0,!0),new Gene(105,1,1,"Adrenal Glands",0,!0),new Gene(106,1,1,"Tireless",0,!0),new Gene(107,1,1,"Fast Recovery",0,!0),new Gene(108,1,1,"Pain Tolerance",0,!0),new Gene(109,1,1,"Fast Twitch",0,!0),new Gene(110,1,1,"Early Puberty",0,!0),new Gene(111,1,1,"Badassery",0,!0),new Gene(112,1,1,"Iron Bones",0,!0),new Gene(113,1,1,"Gamma Irradiated",0,!0),new Gene(114,1,1,"Warrior Ancestry",0,!0),new Gene(115,1,1,"Strong Grip",0,!0),new Gene(200,3,1,"Fanged",0,!0),new Gene(201,3,1,"Razor Teeth",0,!0),new Gene(202,3,1,"Infectious Bite",0,!0),new Gene(203,3,1,"Pinchers",0,!0),new Gene(204,3,1,"Carnivorous",0,!0),new Gene(205,3,1,"Mandibles",0,!0),new Gene(206,3,1,"Unhingable Jaw",0,!0),new Gene(207,3,1,"Bacterial Spit",0,!0),new Gene(208,3,1,"Serrated Teeth",0,!0),new Gene(209,3,1,"Replaceable Teeth",0,!0),new Gene(210,3,1,"Long Snout",0,!0),new Gene(211,3,1,"Hooked Teeth",0,!0),new Gene(212,3,1,"Locking Jaw",0,!0),new Gene(213,3,1,"Prehensile Tounge",0,!0),new Gene(214,3,1,"Whip Tounge",0,!0),new Gene(215,3,1,"Iron Teeth",0,!0),new Gene(300,4,1,"Prehensile Tail",0,!0),new Gene(301,4,1,"Barbed Tail",0,!0),new Gene(302,4,1,"Paralyzing Venom",0,!0),new Gene(303,4,1,"Long Tail",0,!0),new Gene(304,4,1,"Double Tails",0,!0),new Gene(305,4,1,"Forked Stinger",0,!0),new Gene(306,4,1,"Hallucinegenic Venom",0,!0),new Gene(307,4,1,"Decoagulant Venom",0,!0),new Gene(308,4,1,"Acidic Venom",0,!0),new Gene(309,4,1,"Whip Tail",0,!0),new Gene(310,4,1,"Projectile Barbs",0,!0),new Gene(311,4,1,"Iron Barb",0,!0),new Gene(312,4,1,"Tail Slash",0,!0),new Gene(313,4,1,"Lightning Strike",0,!0),new Gene(314,4,1,"Tail Regrowth",0,!0),new Gene(315,4,1,"Seeking Sting",0,!0),new Gene(400,2,1,"Hyperactive",0,!0),new Gene(401,2,1,"Instinctive",0,!0),new Gene(402,2,1,"Sticky Feet",0,!0),new Gene(403,2,1,"Precognitive",0,!0),new Gene(404,2,1,"Tacticle",0,!0),new Gene(405,2,1,"Peripheral Vision",0,!0),new Gene(406,2,1,"Alert",0,!0),new Gene(407,2,1,"Good Balance",0,!0),new Gene(408,2,1,"Winged",0,!0),new Gene(409,2,1,"Finned",0,!0),new Gene(410,2,1,"Radial Movement",0,!0),new Gene(411,2,1,"Segmented Legs",0,!0),new Gene(410,2,1,"Compound Eyes",0,!0),new Gene(411,2,1,"Nimble",0,!0),new Gene(412,2,1,"Dodge",0,!0),new Gene(413,2,1,"High Jumper",0,!0),new Gene(414,2,1,"Clawed Feet",0,!0),new Gene(415,2,1,"Stealth",0,!0)],enemyGenes=[[new Gene(900,2,1,"Gnat Agility",0,!0)],[new Gene(905,2,1,"Ladybug Agility",0,!0)],[new Gene(910,2,1,"Chigger Agility",0,!0)],[new Gene(915,4,1,"Wasp Sting",0,!0)],[new Gene(920,4,1,"Scorpion Sting",0,!0)],[new Gene(925,4,1,"Bee Sting",0,!0)],[new Gene(930,3,1,"Tarantula Bite",0,!0)],[new Gene(935,2,1,"Praying Mantis Agility",0,!0),new Gene(937,1,1,"Praying Mantis Strength",0,!0)],[new Gene(940,0,1,"Centipede Vitality",0,!0),new Gene(941,4,1,"Centipede Sting",0,!0)],[new Gene(945,3,1,"Beetle Bite",0,!0)],[new Gene(950,3,1,"Horsefly Bite",0,!0)],[new Gene(955,3,1,"Termite Bite",0,!0)],[new Gene(960,0,1,"Tick Vitality",0,!0)],[new Gene(965,0,1,"Mosquito Vitality",0,!0)],[new Gene(970,0,1,"Leech Vitality",0,!0)],[new Gene(975,1,1,"Cricket Strength",0,!0)],[new Gene(980,1,1,"Ant Strength",0,!0)],[new Gene(985,1,1,"Grasshopper Strength",0,!0)]],TraitType;
+(),availableGenes=[new Gene(0,0,1,"Limb Regen",0,!0),new Gene(1,0,1,"Biologic Immortal",0,!0),new Gene(2,0,1,"Fast Clotting",0,!0),new Gene(3,0,1,"High Metabolism",0,!0),new Gene(4,0,1,"Reduced Aging",0,!0),new Gene(5,0,1,"Hardened Carapace",0,!0),new Gene(6,0,1,"Vigorous",0,!0),new Gene(7,0,1,"Redundant Organs",0,!0),new Gene(8,0,1,"Exoskeleton",0,!0),new Gene(9,0,1,"Carapace Regen",0,!0),new Gene(10,0,1,"Iron Skin",0,!0),new Gene(11,0,1,"Detachable Tail",0,!0),new Gene(12,0,1,"Ancient Blood",0,!0),new Gene(13,0,1,"Lucky",0,!0),new Gene(14,0,1,"Guardian Angel",0,!0),new Gene(15,0,1,"Replaceable Organs",0,!0),new Gene(100,1,1,"Big Boned",0,!0),new Gene(101,1,1,"Gigantism",0,!0),new Gene(102,1,1,"Increased Mass",0,!0),new Gene(103,1,1,"Berserk Instinct",0,!0),new Gene(104,1,1,"Elastic Tendons",0,!0),new Gene(105,1,1,"Adrenal Glands",0,!0),new Gene(106,1,1,"Tireless",0,!0),new Gene(107,1,1,"Fast Recovery",0,!0),new Gene(108,1,1,"Pain Tolerance",0,!0),new Gene(109,1,1,"Fast Twitch",0,!0),new Gene(110,1,1,"Early Puberty",0,!0),new Gene(111,1,1,"Badassery",0,!0),new Gene(112,1,1,"Iron Bones",0,!0),new Gene(113,1,1,"Gamma Irradiated",0,!0),new Gene(114,1,1,"Warrior Ancestry",0,!0),new Gene(115,1,1,"Strong Grip",0,!0),new Gene(200,3,1,"Fanged",0,!0),new Gene(201,3,1,"Razor Teeth",0,!0),new Gene(202,3,1,"Infectious Bite",0,!0),new Gene(203,3,1,"Pinchers",0,!0),new Gene(204,3,1,"Carnivorous",0,!0),new Gene(205,3,1,"Mandibles",0,!0),new Gene(206,3,1,"Unhingable Jaw",0,!0),new Gene(207,3,1,"Bacterial Spit",0,!0),new Gene(208,3,1,"Serrated Teeth",0,!0),new Gene(209,3,1,"Replaceable Teeth",0,!0),new Gene(210,3,1,"Long Snout",0,!0),new Gene(211,3,1,"Hooked Teeth",0,!0),new Gene(212,3,1,"Locking Jaw",0,!0),new Gene(213,3,1,"Prehensile Tongue",0,!0),new Gene(214,3,1,"Whip Tongue",0,!0),new Gene(215,3,1,"Iron Teeth",0,!0),new Gene(300,4,1,"Prehensile Tail",0,!0),new Gene(301,4,1,"Barbed Tail",0,!0),new Gene(302,4,1,"Paralyzing Venom",0,!0),new Gene(303,4,1,"Long Tail",0,!0),new Gene(304,4,1,"Double Tails",0,!0),new Gene(305,4,1,"Forked Stinger",0,!0),new Gene(306,4,1,"Hallucinogenic Venom",0,!0),new Gene(307,4,1,"Decoagulant Venom",0,!0),new Gene(308,4,1,"Acidic Venom",0,!0),new Gene(309,4,1,"Whip Tail",0,!0),new Gene(310,4,1,"Projectile Barbs",0,!0),new Gene(311,4,1,"Iron Barb",0,!0),new Gene(312,4,1,"Tail Slash",0,!0),new Gene(313,4,1,"Lightning Strike",0,!0),new Gene(314,4,1,"Tail Regrowth",0,!0),new Gene(315,4,1,"Seeking Sting",0,!0),new Gene(400,2,1,"Hyperactive",0,!0),new Gene(401,2,1,"Instinctive",0,!0),new Gene(402,2,1,"Sticky Feet",0,!0),new Gene(403,2,1,"Precognitive",0,!0),new Gene(404,2,1,"Tactile",0,!0),new Gene(405,2,1,"Peripheral Vision",0,!0),new Gene(406,2,1,"Alert",0,!0),new Gene(407,2,1,"Good Balance",0,!0),new Gene(408,2,1,"Winged",0,!0),new Gene(409,2,1,"Finned",0,!0),new Gene(410,2,1,"Radial Movement",0,!0),new Gene(411,2,1,"Segmented Legs",0,!0),new Gene(410,2,1,"Compound Eyes",0,!0),new Gene(411,2,1,"Nimble",0,!0),new Gene(412,2,1,"Dodge",0,!0),new Gene(413,2,1,"High Jumper",0,!0),new Gene(414,2,1,"Clawed Feet",0,!0),new Gene(415,2,1,"Stealth",0,!0)],enemyGenes=[[new Gene(900,2,1,"Gnat Agility",0,!0)],[new Gene(905,2,1,"Ladybug Agility",0,!0)],[new Gene(910,2,1,"Chigger Agility",0,!0)],[new Gene(915,4,1,"Wasp Sting",0,!0)],[new Gene(920,4,1,"Scorpion Sting",0,!0)],[new Gene(925,4,1,"Bee Sting",0,!0)],[new Gene(930,3,1,"Tarantula Bite",0,!0)],[new Gene(935,2,1,"Praying Mantis Agility",0,!0),new Gene(937,1,1,"Praying Mantis Strength",0,!0)],[new Gene(940,0,1,"Centipede Vitality",0,!0),new Gene(941,4,1,"Centipede Sting",0,!0)],[new Gene(945,3,1,"Beetle Bite",0,!0)],[new Gene(950,3,1,"Horsefly Bite",0,!0)],[new Gene(955,3,1,"Termite Bite",0,!0)],[new Gene(960,0,1,"Tick Vitality",0,!0)],[new Gene(965,0,1,"Mosquito Vitality",0,!0)],[new Gene(970,0,1,"Leech Vitality",0,!0)],[new Gene(975,1,1,"Cricket Strength",0,!0)],[new Gene(980,1,1,"Ant Strength",0,!0)],[new Gene(985,1,1,"Grasshopper Strength",0,!0)]],TraitType;
 (function(n)
 	{
 	n[n.Vitality=0]="Vitality";
