@@ -50,7 +50,7 @@
                                         <th colspan="4" style="text-align: right" class="noborder">
                                             <button data-bind="text: pauseBreeding() ? 'unpause' : 'pause', click: $root.TogglePauseBreeding.bind($root), clickBubble: false">pause</button>
                                             <button data-bind="text: 'boost: ' + boosts() + ' / ' + maxBoosts(), click: $root.Boost.bind($root, 'Mother'), clickBubble: false, disable: boosts() < 1">boost</button>
-                                            <button class="upgrade" data-bind="visible: maxFemaleMoundSize() < 9,text: 'upgrade ' + gameFormatNumber(femaleMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'FemaleHatchery'), clickBubble: false, disable: sodRaw() < femaleMoundUpgradeCost()"></button>
+                                            <button class="upgrade" data-bind="visible: maxFemaleMoundSize() < 10,text: 'upgrade ' + gameFormatNumber(femaleMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'FemaleHatchery'), clickBubble: false, disable: sodRaw() < femaleMoundUpgradeCost()"></button>
                                         </th>
                                     </tr>
                                     <!-- ko template: { name: 'critterHeader', data: mother } -->
@@ -67,7 +67,7 @@
                                         <th colspan="4" style="text-align: right" class="noborder">
                                             <button data-bind="text: pauseBreeding() ? 'unpause' : 'pause', click: $root.TogglePauseBreeding.bind($root), clickBubble: false">pause</button>
                                             <button data-bind="text: 'boost: ' + boosts() + ' / ' + maxBoosts(), click: $root.Boost.bind($root, 'Father'), clickBubble: false, disable: boosts() < 1">boost</button>
-                                            <button class="upgrade" data-bind="visible: maxMaleMoundSize() < 9,text: 'upgrade ' + gameFormatNumber(maleMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'MaleHatchery'), clickBubble: false, disable: sodRaw() < maleMoundUpgradeCost()"></button>
+                                            <button class="upgrade" data-bind="visible: maxMaleMoundSize() < 10,text: 'upgrade ' + gameFormatNumber(maleMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'MaleHatchery'), clickBubble: false, disable: sodRaw() < maleMoundUpgradeCost()"></button>
                                         </th>
                                     </tr>
                                     <!-- ko template: { name: 'critterHeader', data: mother } -->
@@ -136,7 +136,7 @@
                                     <tr>
                                         <th colspan="3" class="noborder tableheader">Princess (<span data-bind="text: gameFormatNumber(Math.round((princess().score * 5) - ((princess().currentHealth() / princess().health) * (princess().score * 5))))"></span> sod needed)</th>
                                         <th colspan="4" style="text-align: right" class="noborder">
-                                            <button class="upgrade" data-bind="visible: maxPrincessMoundSize() < 9,text: 'upgrade ' + gameFormatNumber(princessMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'PrincessHatchery'), clickBubble: false, disable: sodRaw() < princessMoundUpgradeCost()"></button>
+                                            <button class="upgrade" data-bind="visible: maxPrincessMoundSize() < 10,text: 'upgrade ' + gameFormatNumber(princessMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'PrincessHatchery'), clickBubble: false, disable: sodRaw() < princessMoundUpgradeCost()"></button>
                                         </th>
                                     </tr>
                                     <!-- ko template: { name: 'critterHeader', data: mother } -->
@@ -151,7 +151,7 @@
                                     <tr>
                                         <th colspan="3" class="noborder tableheader">Prince (<span data-bind="text: gameFormatNumber(Math.round((prince().score * 5) - ((prince().currentHealth() / prince().health) * (prince().score * 5))))"></span> sod needed)</th>
                                         <th colspan="4" style="text-align: right" class="noborder">
-                                            <button class="upgrade" data-bind="visible: maxPrinceMoundSize() < 9,text: 'upgrade ' + gameFormatNumber(princeMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'PrinceHatchery'), clickBubble: false, disable: sodRaw() < princeMoundUpgradeCost()"></button>
+                                            <button class="upgrade" data-bind="visible: maxPrinceMoundSize() < 10,text: 'upgrade ' + gameFormatNumber(princeMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'PrinceHatchery'), clickBubble: false, disable: sodRaw() < princeMoundUpgradeCost()"></button>
                                         </th>
                                     </tr>
                                     <!-- ko template: { name: 'critterHeader', data: mother } -->
@@ -280,7 +280,7 @@
                                     <tr>
                                         <th colspan="4" class="noborder tableheader">Mine <span data-bind="text: mineMound().length"></span>/<span data-bind="text: maxMineMoundSize()"></span> (<span data-bind="text: gameFormatNumber(dirtPerSecond())"></span> dirt per second)</th>
                                         <th colspan="3" style="text-align: right" class="noborder">
-                                            <button class="upgrade" data-bind="visible: maxMineMoundSize() < 9, text: 'upgrade ' + gameFormatNumber(mineMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Mine'), clickBubble: false, disable: sodRaw() < mineMoundUpgradeCost()">upgrade</button>
+                                            <button class="upgrade" data-bind="visible: maxMineMoundSize() < 10, text: 'upgrade ' + gameFormatNumber(mineMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Mine'), clickBubble: false, disable: sodRaw() < mineMoundUpgradeCost()">upgrade</button>
                                             <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Mine'), clickBubble: false">sacrifice</button>
                                         </th>
                                     </tr>
@@ -297,7 +297,7 @@
                                     <tr>
                                         <th colspan="4" class="noborder tableheader">Farm <span data-bind="text: farmMound().length"></span>/<span data-bind="text: maxFarmMoundSize()"></span> (<span data-bind="text: gameFormatNumber(grassPerSecond())"></span> grass per second)</th>
                                         <th colspan="3" style="text-align: right" class="noborder">
-                                            <button class="upgrade" data-bind="visible: maxFarmMoundSize() < 9, text: 'upgrade ' + gameFormatNumber(farmMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Farm'), clickBubble: false, disable: sodRaw() < farmMoundUpgradeCost()">upgrade</button>
+                                            <button class="upgrade" data-bind="visible: maxFarmMoundSize() < 10, text: 'upgrade ' + gameFormatNumber(farmMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Farm'), clickBubble: false, disable: sodRaw() < farmMoundUpgradeCost()">upgrade</button>
                                             <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Farm'), clickBubble: false">sacrifice</button>
                                         </th>
                                     </tr>
@@ -316,7 +316,7 @@
                                     <tr>
                                         <th colspan="4" class="noborder tableheader">Carriers <span data-bind="text: carrierMound().length"></span>/<span data-bind="text: maxCarrierMoundSize()"></span> (<span data-bind="text: gameFormatNumber(carryPerSecond())"></span> carry per second)</th>
                                         <th colspan="3" style="text-align: right" class="noborder">
-                                            <button class="upgrade" data-bind="visible: maxCarrierMoundSize() < 9, text: 'upgrade ' + gameFormatNumber(carrierMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Carrier'), clickBubble: false, disable: sodRaw() < carrierMoundUpgradeCost()">upgrade</button>
+                                            <button class="upgrade" data-bind="visible: maxCarrierMoundSize() < 10, text: 'upgrade ' + gameFormatNumber(carrierMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Carrier'), clickBubble: false, disable: sodRaw() < carrierMoundUpgradeCost()">upgrade</button>
                                             <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Carrier'), clickBubble: false">sacrifice</button>
                                         </th>
                                     </tr>
@@ -333,7 +333,7 @@
                                     <tr>
                                         <th colspan="4" class="noborder tableheader">Factory <span data-bind="text: factoryMound().length"></span>/<span data-bind="text: maxFactoryMoundSize()"></span> (<span data-bind="text: gameFormatNumber(sodPerSecond())"></span> sod per second)</th>
                                         <th colspan="3" style="text-align: right" class="noborder">
-                                            <button class="upgrade" data-bind="visible: maxFactoryMoundSize() < 9, text: 'upgrade ' + gameFormatNumber(factoryMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Factory'), clickBubble: false, disable: sodRaw() < factoryMoundUpgradeCost()">upgrade</button>
+                                            <button class="upgrade" data-bind="visible: maxFactoryMoundSize() < 10, text: 'upgrade ' + gameFormatNumber(factoryMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Factory'), clickBubble: false, disable: sodRaw() < factoryMoundUpgradeCost()">upgrade</button>
                                             <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Factory'), clickBubble: false">sacrifice</button>
                                         </th>
                                     </tr>
@@ -378,7 +378,7 @@
                                     <tr>
                                         <th colspan="3" class="noborder tableheader">Army <span data-bind="text: armyMound().length"></span>/<span data-bind="text: maxArmyMoundSize()"></span></th>
                                         <th colspan="4" style="text-align: right; color: black" class="noborder">
-                                            <button class="upgrade" data-bind="visible: maxArmyMoundSize() < 9, text: 'upgrade ' + gameFormatNumber(armyMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Army'), clickBubble: false, disable: sodRaw() < armyMoundUpgradeCost()">upgrade</button>
+                                            <button class="upgrade" data-bind="visible: maxArmyMoundSize() < 10, text: 'upgrade ' + gameFormatNumber(armyMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'Army'), clickBubble: false, disable: sodRaw() < armyMoundUpgradeCost()">upgrade</button>
                                             <button class="recycle" data-bind="click: $root.Move.bind($root,'Recycle', 'Army'), clickBubble: false, disable: $root.inBattle">sacrifice</button>
                                             <select data-bind="value: armySort, options: armySorts, event:{ change: Sort }"></select>
                                         </th>
