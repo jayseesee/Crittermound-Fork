@@ -109,7 +109,7 @@ var ticksPerSecond=20,game,GameController=function()
 		this.factoryGrassPerSecond=ko.observable(0);
 		this.factorySodPerSecond=ko.observable(0);
 		this.sodPerSecondForBreeding=ko.observable(0);
-		this.sodRaw=ko.observable(0);
+		this.sodRaw=ko.observable(4000);
 		this.sod=ko.computed(function()
 			{
 			return SmartRound(this.sodRaw())
@@ -1464,11 +1464,11 @@ var ticksPerSecond=20,game,GameController=function()
 		this.generation=n;
 		this.id=t;
 		this.gender=i;
-		this.traits.push(new Trait(0,"vitality",5));
-		this.traits.push(new Trait(1,"strength",5));
-		this.traits.push(new Trait(2,"agility",5));
-		this.traits.push(new Trait(3,"bite",5));
-		this.traits.push(new Trait(4,"sting",5))
+		this.traits.push(new Trait(0,"vitality",50));
+		this.traits.push(new Trait(1,"strength",50));
+		this.traits.push(new Trait(2,"agility",50));
+		this.traits.push(new Trait(3,"bite",50));
+		this.traits.push(new Trait(4,"sting",50))
 	}
 	return n.prototype.Load=function(n)
 		{
