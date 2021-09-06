@@ -57,6 +57,8 @@ var ticksPerSecond=20,game,GameController=function()
 		,this);
 		this.newestBorn=ko.observable(0);
 		this.pauseBreeding=ko.observable(!1);
+		this.autoElectQueen = ko.observable(false);
+		this.autoElectKing = ko.observable(false);
 		this.carryPerSecondRaw=ko.observable(0);
 		this.carryPerSecond=ko.computed(function()
 			{
@@ -617,11 +619,11 @@ var ticksPerSecond=20,game,GameController=function()
 		this.CalculateProduction();
 		this.CheckAchievements();
 		this.CheckSave();
-		this.Boost();
-		this.Move('Mate', 'Female', null, {shiftKey: false, ctrlKey: false});
-		this.Move('Mate', 'Male', null, {shiftKey: false, ctrlKey: false});
-		this.Move('Worker', 'Female', null, {shiftKey: false, ctrlKey: false});
-		this.Move('Army', 'Male', null, {shiftKey: false, ctrlKey: false});
+		// this.Boost();
+		// this.Move('Mate', 'Female', null, {shiftKey: false, ctrlKey: false});
+		// this.Move('Mate', 'Male', null, {shiftKey: false, ctrlKey: false});
+		// this.Move('Worker', 'Female', null, {shiftKey: false, ctrlKey: false});
+		// this.Move('Army', 'Male', null, {shiftKey: false, ctrlKey: false});
 	}
 	,n.prototype.UpdateProduction=function()
 		{
@@ -681,6 +683,8 @@ var ticksPerSecond=20,game,GameController=function()
 	}
 	,n.prototype.Breed=function(n,t,i)
 		{
+		this.TryElectKing();
+		this.TryElectQueen();
 		var c,y,u,l,f,h,a,v,s,p,e,o,r;
 		for(n.currentHealth(0),t.currentHealth(0),c=n.generation>t.generation?n.generation+1:t.generation+1,c>this.generations()&&this.generations(c),this.achievementCounts[7].Update(this.generations()),y=CoinFlip()?0:1,u=this.DefaultCritter(y,1,c),r=0;
 		r<n.traits.length;
@@ -713,7 +717,7 @@ var ticksPerSecond=20,game,GameController=function()
 		this.achievementCounts[13].Update(u.totalMutations);
 		i=="Royal"?u.gender==1?this.maleMound.unshift(u):this.femaleMound.unshift(u):(i="Heirs")&&(u.job=5,u.gender==1?this.princeMound.unshift(u):this.princessMound.unshift(u));
 		this.newestBorn(u.id);
-		this.Sort()
+		this.Sort();
 	}
 	,n.prototype.NewGene=function(n)
 		{
@@ -738,6 +742,12 @@ var ticksPerSecond=20,game,GameController=function()
 	,n.prototype.TogglePauseBreeding=function()
 		{
 		this.pauseBreeding(!this.pauseBreeding())
+	}
+	,n.prototype.ToggleAutoElectKing=function() {
+		this.autoElectKing(!this.autoElectKing());
+	}
+	,n.prototype.ToggleAutoElectQueen=function() {
+		this.autoElectQueen(!this.autoElectQueen());
 	}
 	,n.prototype.TogglePauseExplore=function()
 		{
@@ -872,9 +882,7 @@ var ticksPerSecond=20,game,GameController=function()
 	}
 	,n.prototype.Boost=function()
 		{
-		for (let i = 0; i < 100; i++) {
-			this.BreedCheck(!0);
-		}
+			this.boosts()<1||(this.boosts(Math.round((this.boosts()-1)*10)/10),this.BreedCheck(!0))
 	}
 	,n.prototype.Buy=function(n,t)
 		{
@@ -1113,6 +1121,27 @@ var ticksPerSecond=20,game,GameController=function()
 		{
 		var n,t;
 		this.atWar()&&!this.pauseAutoBattle()&&(this.autoBattleClock()<=0?(this.autoBattleClock(this.autoBattleTime),this.map().SetRandomBattle()&&this.StartBattle()):!this.inBattle()&&this.map().tilesCleared()<this.map().tileCount()&&this.armyUpgrades().hasGeneral()?(n=this.nation().fortFound()?50:0,n+=this.nation().isDefeated()?100:0,n+=this.armyUpgrades().generalBonus(),t=1*(1+n/100),this.autoBattleClock(this.autoBattleClock()-t),this.autoBattleClock()<0&&this.autoBattleClock(0)):this.armyUpgrades().hasGeneral()||this.autoBattleClock(this.autoBattleTime))
+	}
+	,n.prototype.TryElectQueen=function() {
+		if (!this.autoElectQueen()) return;
+
+		if (this.femaleMound().length === 0) return;
+
+		if (this.femaleMound()[0].score > this.mother().score) {
+			this.mother(this.femaleMound()[0]);
+			this.femaleMound().shift();
+		}
+	}
+	,n.prototype.TryElectKing=function() {
+		if (!this.autoElectKing()) return;
+
+		if (this.maleMound().length === 0) return;
+
+		if (this.maleMound()[0].score > this.father().score) {
+			this.father(this.maleMound()[0]);
+			this.maleMound().shift();
+		}
+
 	}
 	,n.prototype.Explore=function()
 		{
