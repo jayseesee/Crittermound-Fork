@@ -1,2 +1,4 @@
-
+.firebase/
+.firebaserc
+firebase.json
 .vscode/settings.json
