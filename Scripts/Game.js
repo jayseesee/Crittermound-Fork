@@ -617,9 +617,11 @@ var ticksPerSecond=20,game,GameController=function()
 		this.CalculateProduction();
 		this.CheckAchievements();
 		this.CheckSave();
-		// this.Boost();
-		// this.Move('Mate', 'Female', null, {shiftKey: false, ctrlKey: false});
-		// this.Move('Mate', 'Male', null, {shiftKey: false, ctrlKey: false});
+		this.Boost();
+		this.Move('Mate', 'Female', null, {shiftKey: false, ctrlKey: false});
+		this.Move('Mate', 'Male', null, {shiftKey: false, ctrlKey: false});
+		this.Move('Worker', 'Female', null, {shiftKey: false, ctrlKey: false});
+		this.Move('Army', 'Male', null, {shiftKey: false, ctrlKey: false});
 	}
 	,n.prototype.UpdateProduction=function()
 		{
