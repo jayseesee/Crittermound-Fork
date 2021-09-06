@@ -48,7 +48,7 @@
                                     <tr>
                                         <th colspan="2" class="noborder tableheader">Queen</th>
                                         <th colspan="5" style="text-align: right" class="noborder">
-                                            <button data-bind="text: autoElectQueen() ? 'disable auto elect Queen' : 'auto elect Queen', click: $root.ToggleAutoElectQueen.bind($root), clickBubble: false">auto elect Queen</button>
+                                            <button class="autoElect" data-bind="text: autoElectQueen() ? 'disable auto elect Queen' : 'auto elect Queen', click: $root.ToggleAutoElectQueen.bind($root), clickBubble: false">auto elect Queen</button>
                                             <button data-bind="text: pauseBreeding() ? 'unpause' : 'pause', click: $root.TogglePauseBreeding.bind($root), clickBubble: false">pause</button>
                                             <button data-bind="text: 'boost: ' + boosts() + ' / ' + maxBoosts(), click: $root.Boost.bind($root, 'Mother'), clickBubble: false">boost</button>
                                             <button class="upgrade" data-bind="visible: maxFemaleMoundSize() < 10,text: 'upgrade ' + gameFormatNumber(femaleMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'FemaleHatchery'), clickBubble: false, disable: sodRaw() < femaleMoundUpgradeCost()"></button>
@@ -66,7 +66,7 @@
                                     <tr>
                                         <th colspan="2" class="noborder tableheader">King</th>
                                         <th colspan="5" style="text-align: right" class="noborder">
-                                            <button data-bind="text: autoElectKing() ? 'disable auto elect King' : 'auto elect King', click: $root.ToggleAutoElectKing.bind($root), clickBubble: false">auto elect King</button>
+                                            <button class="autoElect" data-bind="text: autoElectKing() ? 'disable auto elect King' : 'auto elect King', click: $root.ToggleAutoElectKing.bind($root), clickBubble: false">auto elect King</button>
                                             <button data-bind="text: pauseBreeding() ? 'unpause' : 'pause', click: $root.TogglePauseBreeding.bind($root), clickBubble: false">pause</button>
                                             <button data-bind="text: 'boost: ' + boosts() + ' / ' + maxBoosts(), click: $root.Boost.bind($root, 'Father'), clickBubble: false, disable: boosts() < 1">boost</button>
                                             <button class="upgrade" data-bind="visible: maxMaleMoundSize() < 10,text: 'upgrade ' + gameFormatNumber(maleMoundUpgradeCost()) + ' sod', click: $root.Upgrade.bind($root, 'MaleHatchery'), clickBubble: false, disable: sodRaw() < maleMoundUpgradeCost()"></button>
