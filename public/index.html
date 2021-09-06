@@ -11,6 +11,29 @@
     <script src="Scripts/tabcontent.js"></script>
     <script src="Scripts/jquery.base64.min.js"></script>
     <script src="Scripts/jquery.simplemodal.1.4.4.min.js"></script>
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.1/firebase-analytics.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      const firebaseConfig = {
+        apiKey: "AIzaSyCu5OYqy_MjMK6WAaCZ7A_nCAAEao-vCBw",
+        authDomain: "crittermound-72225.firebaseapp.com",
+        projectId: "crittermound-72225",
+        storageBucket: "crittermound-72225.appspot.com",
+        messagingSenderId: "747976673524",
+        appId: "1:747976673524:web:375db7d8960ac9d94836a1",
+        measurementId: "G-ELHBHSE6ZZ"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+    </script>
     <link href="Content/Site.min.css" rel="stylesheet" />
     <link href="Content/tipped.css" rel="stylesheet" />
 
