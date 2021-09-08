@@ -77,11 +77,11 @@ $(document).ready(function () {
 
     Tipped.create(
       "#auto-elect-queen-tooltip",
-      "Each time you manually elect a queen, this number will be incremented by one.",
+      "Manually elect some queens / kings to teach your critters how to choose their future path.",
     );
     Tipped.create(
       "#auto-elect-king-tooltip",
-      "Each time you manually elect a king, this number will be incremented by one.",
+      "Manually elect some queens / kings to teach your critters how to choose their future path.",
     );
 });
 
