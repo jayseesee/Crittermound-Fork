@@ -75,7 +75,14 @@ $(document).ready(function () {
         }
     });
 
-
+    Tipped.create(
+      "#auto-elect-queen-tooltip",
+      "Each time you manually elect a queen, this number will be incremented by one.",
+    );
+    Tipped.create(
+      "#auto-elect-king-tooltip",
+      "Each time you manually elect a king, this number will be incremented by one.",
+    );
 });
 
 function Reset() {
