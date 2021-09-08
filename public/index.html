@@ -44,6 +44,8 @@
 <body>
     <div id="pageContent">
         <div style="float: right; padding: 3px; font-weight: bold;">
+            <span style="margin-left: 15px" data-bind="text: 'Auto Elect Queen Remaining: ' + gameFormatNumber(autoElectQueenTimesRemaining())"></span>
+            <span style="margin-left: 15px" data-bind="text: 'Auto Elect King Remaining: ' + gameFormatNumber(autoElectKingTimesRemaining())"></span>
             <span style="margin-left: 15px" data-bind="text: 'Generations: ' + gameFormatNumber(generations())"></span>
             <span style="margin-left: 15px" data-bind="text: 'Sod: ' + gameFormatNumber(sod())"></span>
         </div>

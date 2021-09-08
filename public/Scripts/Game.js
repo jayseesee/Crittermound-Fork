@@ -57,7 +57,9 @@ var ticksPerSecond=20,game,GameController=function()
 		,this);
 		this.newestBorn=ko.observable(0);
 		this.pauseBreeding=ko.observable(!1);
+    this.autoElectQueenTimesRemaining = ko.observable(0);
 		this.autoElectQueen = ko.observable(false);
+    this.autoElectKingTimesRemaining = ko.observable(0);
 		this.autoElectKing = ko.observable(false);
 		this.carryPerSecondRaw=ko.observable(0);
 		this.carryPerSecond=ko.computed(function()
@@ -823,7 +825,11 @@ var ticksPerSecond=20,game,GameController=function()
 				u.job=0;
 				u.isSelected(!1);
 				u.gender==0&&n=="Mate"?(this.mother(u),this.mother().currentHealth(0)):u.gender==1&&n=="Mate"?(this.father(u),this.father().currentHealth(0)):u.gender==0&&n=="MateYoung"?(l=this.princess().currentHealth()/this.princess().health*this.princess().score,this.princess(u),this.princess().currentHealth(l/this.princess().score*5*this.princess().health)):u.gender==1&&n=="MateYoung"&&(a=this.prince().currentHealth()/this.prince().health*this.prince().score,this.prince(u),this.prince().currentHealth(a/this.prince().score*5*this.prince().health));
-				this.Sort()
+				this.Sort();
+        if (n == "Mate") {
+          if (u.gender == 0) this.autoElectQueenTimesRemaining(this.autoElectQueenTimesRemaining() + 1);
+          if (u.gender == 1) this.autoElectKingTimesRemaining(this.autoElectKingTimesRemaining() + 1);
+        }
 			}
 			break;
 			case"Worker":for(e=0;
@@ -1123,6 +1129,10 @@ var ticksPerSecond=20,game,GameController=function()
 		this.atWar()&&!this.pauseAutoBattle()&&(this.autoBattleClock()<=0?(this.autoBattleClock(this.autoBattleTime),this.map().SetRandomBattle()&&this.StartBattle()):!this.inBattle()&&this.map().tilesCleared()<this.map().tileCount()&&this.armyUpgrades().hasGeneral()?(n=this.nation().fortFound()?50:0,n+=this.nation().isDefeated()?100:0,n+=this.armyUpgrades().generalBonus(),t=1*(1+n/100),this.autoBattleClock(this.autoBattleClock()-t),this.autoBattleClock()<0&&this.autoBattleClock(0)):this.armyUpgrades().hasGeneral()||this.autoBattleClock(this.autoBattleTime))
 	}
 	,n.prototype.TryElectQueen=function() {
+    if (this.autoElectQueenTimesRemaining() <= 0) {
+      this.autoElectQueen(false);
+      return;
+    }
 		if (!this.autoElectQueen()) return;
 
 		if (this.femaleMound().length === 0) return;
@@ -1130,9 +1140,15 @@ var ticksPerSecond=20,game,GameController=function()
 		if (this.femaleMound()[0].score > this.mother().score) {
 			this.mother(this.femaleMound()[0]);
 			this.femaleMound().shift();
+      this.autoElectQueenTimesRemaining(this.autoElectQueenTimesRemaining() - 1);
 		}
+    if (this.autoElectQueenTimesRemaining() <= 0) this.autoElectQueen(false);
 	}
 	,n.prototype.TryElectKing=function() {
+    if (this.autoElectKingTimesRemaining() <= 0) {
+      this.autoElectKing(false);
+      return;
+    }
 		if (!this.autoElectKing()) return;
 
 		if (this.maleMound().length === 0) return;
@@ -1140,8 +1156,9 @@ var ticksPerSecond=20,game,GameController=function()
 		if (this.maleMound()[0].score > this.father().score) {
 			this.father(this.maleMound()[0]);
 			this.maleMound().shift();
+      this.autoElectKingTimesRemaining(this.autoElectKingTimesRemaining() - 1);
 		}
-
+    if (this.autoElectKingTimesRemaining() <= 0) this.autoElectKing(false);
 	}
 	,n.prototype.Explore=function()
 		{
@@ -1349,7 +1366,9 @@ var ticksPerSecond=20,game,GameController=function()
 		{
 		var n=new GameSave,t;
 		n.version="1.0",n.dirtRaw=this.dirtRaw(),n.grassRaw=this.grassRaw(),n.sodRaw=this.sodRaw(),n.factoryDirtRaw=this.factoryDirtRaw(),n.factoryGrassRaw=this.factoryGrassRaw(),n.generations=this.generations(),n.mother=this.mother(),n.father=this.father(),n.princess=this.princess(),n.prince=this.prince(),n.sodDedicatedToBreeding=this.sodDedicatedToBreeding(),n.isHeirsUnlocked=this.isHeirsUnlocked(),n.femaleMound=this.femaleMound(),n.maleMound=this.maleMound(),n.princessMound=this.princessMound(),n.princeMound=this.princeMound(),n.mineMound=this.mineMound(),n.farmMound=this.farmMound(),n.carrierMound=this.carrierMound(),n.factoryMound=this.factoryMound(),n.armyMound=this.armyMound(),n.maxFemaleMoundSize=this.maxFemaleMoundSize(),n.maxMaleMoundSize=this.maxMaleMoundSize(),n.maxPrincessMoundSize=this.maxPrincessMoundSize(),n.maxPrinceMoundSize=this.maxPrinceMoundSize(),n.maxMineMoundSize=this.maxMineMoundSize(),n.bonusMinePercent=this.bonusMinePercent(),n.bonusFarmPercent=this.bonusFarmPercent(),n.bonusCarrierPercent=this.bonusCarrierPercent(),n.bonusFactoryPercent=this.bonusFactoryPercent(),n.maxFarmMoundSize=this.maxFarmMoundSize(),n.maxCarrierMoundSize=this.maxCarrierMoundSize(),n.maxFactoryMoundSize=this.maxFactoryMoundSize(),n.maxArmyMoundSize=this.maxArmyMoundSize(),n.femaleSort=this.femaleSort(),n.maleSort=this.maleSort(),n.princessSort=this.princessSort(),n.princeSort=this.princeSort(),n.armySort=this.armySort(),n.map=this.map(),n.tiles=this.map().tiles(),n.atWar=this.atWar(),n.nations=this.nations(),n.nation=this.nation(),n.achievements=this.achievements(),n.achievementCounts=this.achievementCounts,n.achievementsUnlocked=this.achievementsUnlocked(),n.battleTurnLength=this.battleTurnLength(),n.boosts=this.boosts(),n.maxBoosts=this.maxBoosts(),n.armyUpgrades=this.armyUpgrades();
+    n.autoElectQueenTimesRemaining = this.autoElectQueenTimesRemaining();
     n.autoElectQueen = this.autoElectQueen();
+    n.autoElectKingTimesRemaining = this.autoElectKingTimesRemaining();
     n.autoElectKing = this.autoElectKing();
     t=$.base64.encode(ko.toJSON(n));
     localStorage.setItem("game2",t);
@@ -1364,7 +1383,7 @@ var ticksPerSecond=20,game,GameController=function()
 			{
 			if(n!==null||localStorage.getItem("game2")!==null)
 				{
-				if(t=n!=null?JSON.parse($.base64.decode(n)):JSON.parse($.base64.decode(localStorage.getItem("game2"))),this.dirtRaw(t.dirtRaw),this.grassRaw(t.grassRaw),this.sodRaw(t.sodRaw),this.factoryDirtRaw(t.factoryDirtRaw),this.factoryGrassRaw(t.factoryGrassRaw),this.generations(t.generations),this.sodDedicatedToBreeding(t.sodDedicatedToBreeding),this.isHeirsUnlocked(t.isHeirsUnlocked),this.maxFemaleMoundSize(t.maxFemaleMoundSize),this.maxMaleMoundSize(t.maxMaleMoundSize),this.maxPrincessMoundSize(t.maxPrincessMoundSize),this.maxPrinceMoundSize(t.maxPrinceMoundSize),this.maxMineMoundSize(t.maxMineMoundSize),this.maxFarmMoundSize(t.maxFarmMoundSize),this.maxCarrierMoundSize(t.maxCarrierMoundSize),this.maxFactoryMoundSize(t.maxFactoryMoundSize),this.maxArmyMoundSize(t.maxArmyMoundSize),this.bonusMinePercent(t.bonusMinePercent),this.bonusCarrierPercent(t.bonusCarrierPercent),this.bonusFarmPercent(t.bonusFarmPercent),this.bonusFactoryPercent(t.bonusFactoryPercent),this.femaleSort(t.femaleSort),this.maleSort(t.maleSort),this.princeSort(t.princeSort),this.princessSort(t.princessSort),this.armySort(t.armySort),this.atWar(t.atWar),this.achievementsUnlocked(t.achievementsUnlocked),this.autoElectQueen(t.autoElectQueen),this.autoElectKing(t.autoElectKing),this.battleTurnLength(t.battleTurnLength!=undefined?t.battleTurnLength:ticksPerSecond/2),t.boosts!=undefined&&(this.boosts(t.boosts),this.maxBoosts(t.maxBoosts)),t.nations!=undefined)for(this.nations=ko.observableArray(),i=0;
+				if(t=n!=null?JSON.parse($.base64.decode(n)):JSON.parse($.base64.decode(localStorage.getItem("game2"))),this.dirtRaw(t.dirtRaw),this.grassRaw(t.grassRaw),this.sodRaw(t.sodRaw),this.factoryDirtRaw(t.factoryDirtRaw),this.factoryGrassRaw(t.factoryGrassRaw),this.generations(t.generations),this.sodDedicatedToBreeding(t.sodDedicatedToBreeding),this.isHeirsUnlocked(t.isHeirsUnlocked),this.maxFemaleMoundSize(t.maxFemaleMoundSize),this.maxMaleMoundSize(t.maxMaleMoundSize),this.maxPrincessMoundSize(t.maxPrincessMoundSize),this.maxPrinceMoundSize(t.maxPrinceMoundSize),this.maxMineMoundSize(t.maxMineMoundSize),this.maxFarmMoundSize(t.maxFarmMoundSize),this.maxCarrierMoundSize(t.maxCarrierMoundSize),this.maxFactoryMoundSize(t.maxFactoryMoundSize),this.maxArmyMoundSize(t.maxArmyMoundSize),this.bonusMinePercent(t.bonusMinePercent),this.bonusCarrierPercent(t.bonusCarrierPercent),this.bonusFarmPercent(t.bonusFarmPercent),this.bonusFactoryPercent(t.bonusFactoryPercent),this.femaleSort(t.femaleSort),this.maleSort(t.maleSort),this.princeSort(t.princeSort),this.princessSort(t.princessSort),this.armySort(t.armySort),this.atWar(t.atWar),this.achievementsUnlocked(t.achievementsUnlocked),this.autoElectQueenTimesRemaining(t.autoElectQueenTimesRemaining),this.autoElectQueen(t.autoElectQueen),this.autoElectKingTimesRemaining(t.autoElectKingTimesRemaining),this.autoElectKing(t.autoElectKing),this.battleTurnLength(t.battleTurnLength!=undefined?t.battleTurnLength:ticksPerSecond/2),t.boosts!=undefined&&(this.boosts(t.boosts),this.maxBoosts(t.maxBoosts)),t.nations!=undefined)for(this.nations=ko.observableArray(),i=0;
 				i<t.nations.length;
 				i++)u=new Nation(t.nations[i].enemy,t.nations[i].custom,t.nations[i].name,t.nations[i].desc,t.nations[i].lowBaseValue,t.nations[i].highBaseValue,t.nations[i].armySizeBase,t.nations[i].requiredToUnlock,t.nations[i].treasurePoints),u.mineFound(t.nations[i].mineFound),u.farmFound(t.nations[i].farmFound),u.carryFound(t.nations[i].carryFound),u.factoryFound(t.nations[i].factoryFound),u.exploreFound(t.nations[i].exploreFound),u.fortFound(t.nations[i].fortFound!=undefined?t.nations[i].fortFound:!1),u.geneFound(t.nations[i].geneFound),u.boostFound(t.nations[i].boostFound),u.treasuresFound(t.nations[i].treasuresFound),u.mapComplete(t.nations[i].mapComplete),u.isDefeated(t.nations[i].isDefeated),u.isUnlocked(t.nations[i].isUnlocked),this.nations.push(u);
 				if(t.map!=undefined)for(this.map(new GameMap),this.map().mound=t.map.mound,this.map().enemy=t.map.enemy,this.map().mine=t.map.mine,this.map().farm=t.map.farm,this.map().carry=t.map.carry,this.map().factory=t.map.factory,this.map().explore=t.map.explore,this.map().boost=t.map.boost,this.map().gene=t.map.gene,this.map().fort=t.map.fort,this.map().treasures=t.map.treasures,this.map().tileCount(t.map.tileCount),this.map().tilesCleared(t.map.tilesCleared),this.map().canExplore(t.map.canExplore),this.map().highestDanger=t.map.highestDanger!=undefined?t.map.highestDanger:1,i=0;
